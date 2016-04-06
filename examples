@@ -1,1 +1,18 @@
 HARIS Examples
+
++- comments -+
+
+BOOL #t, #f
+INT 5
+LIST ^INT $ INT^
+{BOOL, INT} +- tuple examples -+
+
+
+[skiadas function_name [inputs] 
+  [body]
+]
+
+let (e1) in (e2)
+
+group (e1) in
+$ (e2) >> (e3)
