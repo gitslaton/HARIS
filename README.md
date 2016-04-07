@@ -22,3 +22,12 @@ ocamlc -c types.mli parser.mli lexer.ml parser.ml types.ml driver.ml
 Start utop
 Enter: #load "types.cmo";;
 Enter: #use "tests.ml";;
+
+
+[types.ml](https://github.com/gitslaton/HARIS/blob/master/types.ml)
+
+[types.mli](https://github.com/gitslaton/HARIS/blob/master/types.mli)
+
+[lexer](https://github.com/gitslaton/HARIS/blob/master/lexer.mll)
+
+[parser](https://github.com/gitslaton/HARIS/blob/master/parser.mly)
