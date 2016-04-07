@@ -91,10 +91,14 @@ let rec desugar exprS = match exprS with
 let rec interp env r = match r with
                        | NumC i        -> Num i
                        | BoolC b 	    -> Bool b
-                       | IfC (test, option1, option2) -> (match (interp env test) with 
-                                                         | Bool true -> interp env option1 
-                                                         | Bool false -> interp env option2 
-                                                         | _ -> raise (Interp "Not Boolean")) 
+                       | IfC (test, option1, option2) -> (*let t1 = interp env option1 in
+                       										let t2 = interp env option2 in 
+                       											(match (t1, t2) in
+                       											 | Num )*)
+                       											(match (interp env test) with 
+		                                                         | Bool true -> t1
+		                                                         | Bool false -> t2
+		                                                         | _ -> raise (Interp "Not Boolean"))
                        | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r) 
@@ -109,3 +113,5 @@ let evaluate exprC = exprC |> interp []
 let rec valToString r = match r with
   | Num i           -> string_of_float i
   | Bool b 			    -> string_of_bool b
+
+

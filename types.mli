@@ -4,17 +4,17 @@ exception Interp of string       (* Use for interpreter errors *)
 
 type exprS = NumS of float 
 		   | BoolS of bool 
-		   | IfS of exprS * exprS * exprS
+		   | IfS of exprS * exprS * exprS 
     	   | OrS of exprS * exprS 
-    	   | AndS of exprS * exprS
-    	   | NotS of exprS
+    	   | AndS of exprS * exprS 
+    	   | NotS of exprS 
     	   | ArithS of string * exprS * exprS 
     	   | CompS of string * exprS * exprS 
            | EqS of exprS * exprS 
            | NeqS of exprS * exprS 
 type exprC = NumC of float 
 		   | BoolC of bool 
-		   | IfC of exprC * exprC * exprC
+		   | IfC of exprC * exprC * exprC 
 		   | ArithC of string  * exprC * exprC 
 		   | CompC of string * exprC * exprC 
 		   | EqC of exprC * exprC 
