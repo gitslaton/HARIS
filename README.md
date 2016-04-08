@@ -30,10 +30,20 @@ Start utop and enter
 
 #### Important files 
 
-[types.ml](https://github.com/gitslaton/HARIS/blob/master/types.ml)
+[types.ml](https://github.com/gitslaton/HARIS/blob/master/types.ml):  File that contains all of the types for HARIS.
 
-[types.mli](https://github.com/gitslaton/HARIS/blob/master/types.mli)
+[types.mli](https://github.com/gitslaton/HARIS/blob/master/types.mli):  Interface file for types.ml
 
-[lexer](https://github.com/gitslaton/HARIS/blob/master/lexer.mll)
+[lexer](https://github.com/gitslaton/HARIS/blob/master/lexer.mll): Defines expressions for tokens defined in the parser.mly.
 
-[parser](https://github.com/gitslaton/HARIS/blob/master/parser.mly)
+[details](https://github.com/gitslaton/HARIS/blob/master/details.md): File that contains issues and processes of conquering them.
+
+[examples](https://github.com/gitslaton/HARIS/blob/master/examples): Shows examples of HARIS style programming.
+
+[semantics](https://github.com/gitslaton/HARIS/blob/master/semantics.md): Shows syntax for HARIS.
+
+[tests](https://github.com/gitslaton/HARIS/blob/master/tests.ml): Tests for HARIS.
+
+
+
+[parser](https://github.com/gitslaton/HARIS/blob/master/parser.mly): File that defines tokens and procedures.
