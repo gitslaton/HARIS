@@ -21,6 +21,7 @@ type exprC = NumC of float
            | CompC of string * exprC * exprC 
            | EqC of exprC * exprC 
            | TupC of exprC * exprC
+           
 (* You will need to add more cases here. *)
 type value = Num of float 
            | Bool of bool 
