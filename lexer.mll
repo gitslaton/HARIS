@@ -18,6 +18,8 @@ let false = "false" | "#f"
 let comp = ">" | ">=" | "<" | "<=" 
 
 
+
+
 rule token = parse
   | white       { token lexbuf }
   | newline     { token lexbuf }
@@ -37,6 +39,9 @@ rule token = parse
   | "/"         { DIVIDE } 
   | "=="        { EQ }
   | "!="        { NEQ }
+  | "{"         { CURLY_L }
+  | "}"         { CURLY_R }
+  | ","         { COMMA }
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
   | any         { raise Unrecognized }

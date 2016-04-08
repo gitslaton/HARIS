@@ -12,14 +12,17 @@ type exprS = NumS of float
     	   | CompS of string * exprS * exprS 
            | EqS of exprS * exprS 
            | NeqS of exprS * exprS 
+           | TupS of exprS * exprS
 type exprC = NumC of float 
 		   | BoolC of bool 
 		   | IfC of exprC * exprC * exprC 
 		   | ArithC of string  * exprC * exprC 
 		   | CompC of string * exprC * exprC 
 		   | EqC of exprC * exprC 
+		   | TupC of exprC * exprC
 type value = Num of float 
 		   | Bool of bool 
+		   | Tup of value * value
 
 (* Environment lookup *)
 type 'a env
