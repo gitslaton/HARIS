@@ -3,7 +3,7 @@ Programming Languages Final Project
 
 To compile:
 
-ocamlyacc parser.mly
+`ocamlyacc parser.mly`
 ocamllex lexer.mll
 ocamlc -c types.mli parser.mli lexer.ml parser.ml types.ml driver.ml
 ocamlc -o lang lexer.cmo parser.cmo types.cmo driver.cmo
