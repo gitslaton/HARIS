@@ -22,10 +22,8 @@ To run the interpreter tests:
 
 `ocamlc -c types.mli parser.mli lexer.ml parser.ml types.ml driver.ml`
 
-Start utop
-Enter: 
+Start utop, and enter
 `#load "types.cmo";;`
-Enter:
 `#use "tests.ml";;`
 
 
