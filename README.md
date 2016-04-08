@@ -44,6 +44,4 @@ Start utop and enter
 
 [tests](https://github.com/gitslaton/HARIS/blob/master/tests.ml): Tests for HARIS.
 
-
-
 [parser](https://github.com/gitslaton/HARIS/blob/master/parser.mly): File that defines tokens and procedures.
