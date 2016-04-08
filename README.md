@@ -25,7 +25,8 @@ To run the interpreter tests:
 Start utop and enter
 ```utop 
 #load "types.cmo";;
-#use "tests.ml";;```
+#use "tests.ml";;
+```
 
 
 [types.ml](https://github.com/gitslaton/HARIS/blob/master/types.ml)
