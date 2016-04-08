@@ -21,6 +21,7 @@ It is worth it to write some sample programs as you go by and load them that way
 To run the interpreter tests:
 
 `ocamlc -c types.mli parser.mli lexer.ml parser.ml types.ml driver.ml`
+
 Start utop
 Enter: 
 `#load "types.cmo";;`
