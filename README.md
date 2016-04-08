@@ -22,9 +22,10 @@ To run the interpreter tests:
 
 `ocamlc -c types.mli parser.mli lexer.ml parser.ml types.ml driver.ml`
 
-Start utop, and enter
-`#load "types.cmo";;`
-`#use "tests.ml";;`
+Start utop and enter
+```utop 
+#load "types.cmo";;
+#use "tests.ml";;```
 
 
 [types.ml](https://github.com/gitslaton/HARIS/blob/master/types.ml)
