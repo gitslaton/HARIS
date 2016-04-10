@@ -1,4 +1,5 @@
 # HARIS
+## "Handy And Radically Impressive Syntax"
 Programming Languages Final Project
 
 To compile:
