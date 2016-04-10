@@ -42,6 +42,13 @@ rule token = parse
   | "{"         { CURLY_L }
   | "}"         { CURLY_R }
   | ","         { COMMA }
+  (*
+  | "("         { PAREN_L }
+  | ")"         { PAREN_R }
+  | "["         { BRACK_L } 
+  | "]"         { BRACK_R }
+  | "="         { EQUAL } 
+  *)
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
   | any         { raise Unrecognized }
