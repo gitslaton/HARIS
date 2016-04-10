@@ -77,4 +77,18 @@ The `group` statement is expressed in the following manner:
 group (expr1) in
 $ (expr2) >> (expr3)
 ```
-The `group`statement.
+The `group`statement matches `expr1`, which must be surrounded by `( )`, with cases listed sequentially (denoted by the `$`), such as `expr2`. Whenever `expr1` matches a case, it runs the code for that case, such as `expr3` in the above example; the `>>` symbols separate the match expression from the expression that needs to be run.
+
+
+### Comments ###
+Commenting in HARIS are declared by the combination of the `+` symbol and the `-` symbol, creating `+-`. To end a comment, whether on one or multiple lines, use the reverse, as in `-+`.
+The following is an example:
+```
++-This is a single line comment.-+
+
++-
+This is a
+multiple line
+comment.
+-+
+```
