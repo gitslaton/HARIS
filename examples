@@ -16,3 +16,15 @@ let (e1) in (e2)
 
 group (e1) in
 $ (e2) >> (e3)
+
+
+PARSER
+(*
+    | CURLY_L expr_tuple CURLY_R      { TupS ($2)}
+  *)
+
+(*
+expr_tuple:
+  | first COMMA second                        { $1 :: $3 } 
+  | head COMMA expr_tuple                     { $1 :: $3 }
+*)

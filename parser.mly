@@ -5,12 +5,16 @@
 %token <float> FLOAT
 %token TRUE FALSE
 %token DBLSEMI 
-%token CURLY_L COMMA CURLY_R
 %token IF THEN ELSE 
 %token OR AND NOT 
 %token PLUS MINUS TIMES DIVIDE 
 %token <string> COMPOP
 %token EQ NEQ 
+%token CURLY_L COMMA CURLY_R
+%token CARROT DOLLAR CARROT
+%token PAREN_L PAREN_R
+%token BRACK_L BRACK_R
+%token EQUAL
 %nonassoc FLOAT
 %nonassoc ELSE
 %left OR AND 
@@ -32,6 +36,11 @@ headEx:
   | expr                         { $1 }
 ;
 
+expr_lst:
+  | headEx                            { [$1] }
+  | headEx DOLLAR expr_lst            { $1 :: $3 }
+;
+
 expr:
   | FLOAT                           { NumS $1 } 
   | TRUE 						                { BoolS true} 
@@ -48,5 +57,5 @@ expr:
   | expr COMPOP expr 			          { CompS ($2, $1, $3) } 
   | expr EQ expr 				            { EqS ($1, $3) }
   | expr NEQ expr 				          { NeqS ($1, $3) }
-
+  | CARROT expr_lst CARROT          { ListS ($2) }
 ;

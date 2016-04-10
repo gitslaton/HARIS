@@ -13,6 +13,7 @@ type exprS = NumS of float
            | EqS of exprS * exprS 
            | NeqS of exprS * exprS 
            | TupS of exprS * exprS
+           | ListS of exprS list
 type exprC = NumC of float 
 		   | BoolC of bool 
 		   | IfC of exprC * exprC * exprC 
@@ -20,10 +21,11 @@ type exprC = NumC of float
 		   | CompC of string * exprC * exprC 
 		   | EqC of exprC * exprC 
 		   | TupC of exprC * exprC
+		   | ListC of exprC list
 type value = Num of float 
 		   | Bool of bool 
 		   | Tup of value * value
-
+		   | List of value list
 (* Environment lookup *)
 type 'a env
 val empty : 'a env
