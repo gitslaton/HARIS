@@ -95,4 +95,5 @@ let t8j = evaluate (desugar (NeqS (NumS 5.0, NumS 4.0))) = Bool true
 (*TUP TESTS*)
 let t9a = evaluate (TupC (NumC 1.0, BoolC true)) = Tup (Num 1.0, Bool true)
 
-
+(*LIST TESTS*)
+let t10a = evaluate (^10 $ 10^)

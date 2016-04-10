@@ -13,6 +13,7 @@ type exprS = NumS of float
            | EqS of exprS * exprS 
            | NeqS of exprS * exprS
            | TupS of exprS * exprS
+           | ListS of exprS list
 (* You will need to add more cases here. *)
 type exprC = NumC of float 
            | BoolC of bool 
@@ -21,11 +22,13 @@ type exprC = NumC of float
            | CompC of string * exprC * exprC 
            | EqC of exprC * exprC 
            | TupC of exprC * exprC
+           | ListC of exprC list
            
 (* You will need to add more cases here. *)
 type value = Num of float 
            | Bool of bool 
            | Tup of value * value
+           | List of value list 
 
 
 type 'a env = (string * 'a) list
@@ -87,6 +90,7 @@ let rec desugar exprS = match exprS with
                         | CompS (str_operator, NumS val_l, NumS val_r) -> CompC (str_operator, NumC val_l, NumC val_r) 
                         | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
                         | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
+                        | ListS list_val      -> ListC (List.map desugar list_val)
                         | TupS (val_l, val_r) -> TupC (desugar val_l, desugar val_r)
                         | _ -> raise (Interp "desugar - Match Not Found")
 
@@ -102,7 +106,8 @@ let rec interp env r = match r with
                                                           | _  -> raise (Interp "not a bool"))
                        | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
-                       | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r) 
+                       | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
+                       | ListC list_val 	-> List (List.map (interp env) list_val)
                        | TupC (val_1, val_2) -> Tup (interp env val_1, interp env val_2)
 
 
@@ -112,9 +117,15 @@ let evaluate exprC = exprC |> interp []
 
 
 (* You will need to add cases to this function as you add new value types. *)
-let rec valToString r = match r with
+let rec valToString r = 
+  let rec list_to_string lst =
+  						match lst with
+  						| [] -> ""
+  						| hd :: [] -> valToString hd
+  						| hd :: tl -> valToString hd ^ " $ " ^ list_to_string tl in
+  match r with
   | Num i           -> string_of_float i
   | Bool b 			    -> string_of_bool b
   | Tup (n, k)      -> "{" ^ valToString n ^ ", " ^ valToString k ^ "}"
-
+  | List lst 		->  "^" ^ (list_to_string lst) ^ "^" 
 
