@@ -40,9 +40,9 @@ Tuples are contained by curly braces, `{ }`, and individual elements within a tu
 
 ### Lists ###
 Lists are sequences of elements. They do not all have to have the same type. 
-Lists are contained by the carrot symbol, `^`, and individual elements within a list are separated by the dollar symbol, `$`, like the following example:
+Lists are contained by the curly braces, `{ }`, and the carrot symbol, `^`, in combination, `{^ ^}`, and individual elements within a list are separated by the dollar symbol, `$`, like the following example:
 ```
-^ 1.0 $ true $ 2.0 ^
+{^ 1.0 $ true $ 2.0 ^}
 ```
 
 
