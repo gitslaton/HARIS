@@ -47,11 +47,11 @@ rule token = parse
   | "["         { BRACK_L } 
   | "]"         { BRACK_R }
   | "="         { EQUAL } 
-<<<<<<< HEAD
-=======
-  | "^"         { CARROT }
+  | "{^"        { CARROT_L }
+  | "^}"        { CARROT_R }
+  | "+-"        {COMMENT_L}
+  | "-+"        {COMMENT_R}
   | "$"         { DOLLAR }
->>>>>>> origin/master
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
   | any         { raise Unrecognized }

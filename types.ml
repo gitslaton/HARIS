@@ -12,8 +12,9 @@ type exprS = NumS of float
            | CompS of string * exprS * exprS 
            | EqS of exprS * exprS 
            | NeqS of exprS * exprS
-           | TupS of exprS * exprS
+           | TupS of exprS list
            | ListS of exprS list
+           | CommentS
 (* You will need to add more cases here. *)
 type exprC = NumC of float 
            | BoolC of bool 
@@ -21,14 +22,16 @@ type exprC = NumC of float
            | ArithC of string  * exprC * exprC 
            | CompC of string * exprC * exprC 
            | EqC of exprC * exprC 
-           | TupC of exprC * exprC
+           | TupC of exprC list
            | ListC of exprC list
+           | CommentC
            
 (* You will need to add more cases here. *)
 type value = Num of float 
            | Bool of bool 
-           | Tup of value * value
+           | Tup of value list
            | List of value list 
+           | Comment
 
 
 type 'a env = (string * 'a) list
@@ -91,7 +94,8 @@ let rec desugar exprS = match exprS with
                         | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
                         | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
                         | ListS list_val      -> ListC (List.map desugar list_val)
-                        | TupS (val_l, val_r) -> TupC (desugar val_l, desugar val_r)
+                        | TupS list_val -> TupC (List.map desugar list_val)
+                        | CommentS  -> CommentC
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
@@ -108,7 +112,8 @@ let rec interp env r = match r with
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
                        | ListC list_val 	-> List (List.map (interp env) list_val)
-                       | TupC (val_1, val_2) -> Tup (interp env val_1, interp env val_2)
+                       | TupC list_val -> Tup  (List.map (interp env) list_val)
+                       | CommentC -> Comment
 
 
 (* evaluate : exprC -> val *)
@@ -118,14 +123,20 @@ let evaluate exprC = exprC |> interp []
 
 (* You will need to add cases to this function as you add new value types. *)
 let rec valToString r = 
-  let rec list_to_string lst =
-  						match lst with
-  						| [] -> ""
-  						| hd :: [] -> valToString hd
-  						| hd :: tl -> valToString hd ^ " $ " ^ list_to_string tl in
+  let rec list_to_string lst t =
+    match t with
+    | "list" -> (match lst with
+            		| [] -> ""
+            		| hd :: [] -> valToString hd
+            		| hd :: tl -> (valToString hd ^ " $ " ^ list_to_string tl "list"))
+    | _ -> (match lst with
+                | [] -> ""
+                | hd :: [] -> valToString hd
+                | hd :: tl -> (valToString hd ^ ", " ^ list_to_string tl "tup")) in 
   match r with
   | Num i           -> string_of_float i
   | Bool b 			    -> string_of_bool b
-  | Tup (n, k)      -> "{" ^ valToString n ^ ", " ^ valToString k ^ "}"
-  | List lst 		->  "^" ^ (list_to_string lst) ^ "^" 
+  | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
+  | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
+  | Comment         -> ""
 

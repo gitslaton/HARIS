@@ -8,10 +8,11 @@
 %token IF THEN ELSE 
 %token OR AND NOT 
 %token PLUS MINUS TIMES DIVIDE 
+%token COMMENT_L COMMENT_R
 %token <string> COMPOP
 %token EQ NEQ 
 %token CURLY_L COMMA CURLY_R
-%token CARROT DOLLAR CARROT
+%token CARROT_L DOLLAR CARROT_R
 %token PAREN_L PAREN_R
 %token BRACK_L BRACK_R
 %token EQUAL
@@ -38,14 +39,20 @@ headEx:
 
 expr_lst:
   | headEx                            { [$1] }
+  | headEx COMMA expr_lst            { $1 :: $3 }
   | headEx DOLLAR expr_lst            { $1 :: $3 }
 ;
 
+comment_lst:
+  | headEx { }
+;
 expr:
   | FLOAT                           { NumS $1 } 
   | TRUE 						                { BoolS true} 
-  | FALSE 						              { BoolS false} 
-  | CURLY_L expr COMMA expr CURLY_R { TupS ($2, $4)}
+  | FALSE 						              { BoolS false}
+  | CURLY_L CURLY_R                 {TupS []} 
+  | CURLY_L expr_lst CURLY_R       { TupS $2 }
+  | COMMENT_L comment_lst COMMENT_R         {CommentS}
   | IF expr THEN expr ELSE expr     { IfS ($2, $4, $6) } 
   | expr OR expr 				            { OrS ($1, $3) } 
   | expr AND expr 				          { AndS ($1, $3) } 
@@ -57,5 +64,6 @@ expr:
   | expr COMPOP expr 			          { CompS ($2, $1, $3) } 
   | expr EQ expr 				            { EqS ($1, $3) }
   | expr NEQ expr 				          { NeqS ($1, $3) }
-  | CARROT expr_lst CARROT          { ListS ($2) }
+  | CARROT_L CARROT_R                   {ListS []}
+  | CARROT_L expr_lst CARROT_R         { ListS ($2) }
 ;
