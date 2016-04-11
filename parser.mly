@@ -3,6 +3,7 @@
 %}
 
 %token <float> FLOAT
+%token VAR
 %token TRUE FALSE
 %token DBLSEMI 
 %token IF THEN ELSE 

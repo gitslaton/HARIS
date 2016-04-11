@@ -5,14 +5,14 @@
 }
 
 let any = _
-let comm = "+-" _ "-+"
 let digit = ['0'-'9']
 let sign = ['+' '-']
 let frac = '.' digit+
 let exp = ['e' 'E'] sign? digit+
 let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
-let alpha = ['a'-'z' 'A'-'Z' '_']
+let alpha_num = ['a'-'z' 'A'-'Z' '_']* ['0'-'9']+
+let comm = "+-" ['0'-'9' 'a'-'z' 'A'-'Z' '_' ' ' '\t' '\n' '\r']* "-+" 
 let dblsemi = ";;"
 let float = (digit+ '.'? | digit* frac) exp?
 let true = "true" | "#t" 
@@ -30,6 +30,7 @@ rule token = parse
   | float as x  { FLOAT (float_of_string x) }
   | true 		    { TRUE } 
   | false 		  { FALSE }
+  | alpha_num   { VAR }
   | "if"        { IF }
   | "then"      { THEN }
   | "else"      { ELSE }
