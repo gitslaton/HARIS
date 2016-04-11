@@ -37,20 +37,18 @@ Tuples are contained by curly braces, `{ }`, and individual elements within a tu
 {true, 1.0, false}
 ```
 
-
 ### Lists ###
-Lists are sequences of elements. They do not all have to have the same type. 
+Lists are sequences of elements. All elements within the list have to be of the same type. 
 Lists are contained by the curly braces, `{ }`, and the carrot symbol, `^`, in combination, `{^ ^}`, and individual elements within a list are separated by the dollar symbol, `$`, like the following example:
 ```
-{^ 1.0 $ true $ 2.0 ^}
+{^ 1. $ 1.5 $ 2. ^}
 ```
-
 
 ### Functions ###
 Functions in HARIS are declared in the following manner:
 ```
-[skiadas function_name [function_inputs] 
-  [function_body
+[skiadas function_name [function_inputs] =
+  [function_body]
 ]
 ```
 A function is contained by brackets, `[ ]`. The keywork `skiadas` is within the surrounding brackets followed by a function name (expressed as `function_name` in the example). Two sets of brackets follow, the first for the function inputs (expressed as `function_inputs` in the example) and the second for the body of the function (expressed as `function_body` in the example).
