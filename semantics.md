@@ -79,7 +79,7 @@ The `group`statement matches `expr1`, which must be surrounded by `( )`, with ca
 
 
 ### Comments ###
-Commenting in HARIS are declared by the combination of the `+` symbol and the `-` symbol, creating `+-`. To end a comment, whether on one or multiple lines, use the reverse, as in `-+`.
+Commenting in HARIS is declared with the combination of the `+` symbol and the `-` symbol, creating `+-`. To end a comment, whether on one or multiple lines, use the reverse, as in `-+`.
 The following is an example:
 ```
 +-This is a single line comment.-+
@@ -90,3 +90,4 @@ multiple line
 comment.
 -+
 ```
+Comments can contain any lowercase or uppercase letters (e.g. `a` or `A`), numbers, underscores (e.g. `_`), or whitespace.
