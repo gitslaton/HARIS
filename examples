@@ -17,14 +17,35 @@ let (e1) in (e2)
 group (e1) in
 $ (e2) >> (e3)
 
-
-PARSER
 (*
-    | CURLY_L expr_tuple CURLY_R      { TupS ($2)}
-  *)
+(*LEXER*)
+  | "SKIADAS"   { FUN_DECL }
+  | "GROUP"     { GROUP }
+  | "IN"        { IN } 
+  | ">>"        { ARROWS }
+  
+(*PARSER*)
+expr_var:
+  (*something to recognize string with variable name*)
+  |  
 
-(*
-expr_tuple:
-  | first COMMA second                        { $1 :: $3 } 
-  | head COMMA expr_tuple                     { $1 :: $3 }
+expr_func:
+  | BRACK_L FUN_DECL expr_var BRACK_L expr BRACK_R EQUAL BRACK_L expr BRACK_R BRACK_R
+  | 
+
+expr_group:
+  | DOLLAR PAREN_L expr PAREN_R ARROWS PAREN_L expr PAREN_R               { ($3, $7) }
+  | DOLLAR PAREN_L expr PAREN_R ARROWS PAREN_L expr PAREN_R expr_group    { ($3, $7) :: $9 }
+  
+epxr:
+  (*VARIABLE ASSIGNMENT*)
+  | expr_var EQUAL expr     {  } 
+  (*GROUP STATEMENT*)
+  | GROUP PAREN_L expr PAREN_R IN expr_group      { GroupS ($3, $6) }
+
+(*TYPES*)
+  | GroupS of exprS * ListS 
+  (*desugar to IfC???*)
+  
+
 *)
