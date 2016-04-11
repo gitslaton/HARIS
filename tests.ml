@@ -1,5 +1,17 @@
 open Types
 
+(*
+[SKIADAS test_fun [x, y] =
+	[x + y]
+]
+
+test_fun [5, 10];;
+test_fun [10, 10];;
+
+*)
+
+
+
 (* You can test expressions of type resultS or resultC and how they are evaluated *)
 (* These will only work once you have compiled types.ml *)
 
