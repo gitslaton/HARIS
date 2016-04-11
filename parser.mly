@@ -8,7 +8,6 @@
 %token IF THEN ELSE 
 %token OR AND NOT 
 %token PLUS MINUS TIMES DIVIDE 
-%token COMMENT_L COMMENT_R
 %token <string> COMPOP
 %token EQ NEQ 
 %token CURLY_L COMMA CURLY_R
@@ -43,16 +42,13 @@ expr_lst:
   | headEx DOLLAR expr_lst            { $1 :: $3 }
 ;
 
-comment_lst:
-  | headEx { }
-;
+
 expr:
   | FLOAT                           { NumS $1 } 
   | TRUE 						                { BoolS true} 
   | FALSE 						              { BoolS false}
   | CURLY_L CURLY_R                 {TupS []} 
-  | CURLY_L expr_lst CURLY_R       { TupS $2 }
-  | COMMENT_L comment_lst COMMENT_R         {CommentS}
+  | CURLY_L expr_lst CURLY_R        { TupS $2 }
   | IF expr THEN expr ELSE expr     { IfS ($2, $4, $6) } 
   | expr OR expr 				            { OrS ($1, $3) } 
   | expr AND expr 				          { AndS ($1, $3) } 

@@ -5,12 +5,14 @@
 }
 
 let any = _
+let comm = "+-" _ "-+"
 let digit = ['0'-'9']
 let sign = ['+' '-']
 let frac = '.' digit+
 let exp = ['e' 'E'] sign? digit+
 let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
+let alpha = ['a'-'z' 'A'-'Z' '_']
 let dblsemi = ";;"
 let float = (digit+ '.'? | digit* frac) exp?
 let true = "true" | "#t" 
@@ -23,6 +25,7 @@ let comp = ">" | ">=" | "<" | "<="
 rule token = parse
   | white       { token lexbuf }
   | newline     { token lexbuf }
+  | comm        { token lexbuf }
   | dblsemi     { DBLSEMI }
   | float as x  { FLOAT (float_of_string x) }
   | true 		    { TRUE } 
@@ -49,8 +52,6 @@ rule token = parse
   | "="         { EQUAL } 
   | "{^"        { CARROT_L }
   | "^}"        { CARROT_R }
-  | "+-"        {COMMENT_L}
-  | "-+"        {COMMENT_R}
   | "$"         { DOLLAR }
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
