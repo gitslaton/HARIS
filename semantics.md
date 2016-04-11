@@ -47,11 +47,11 @@ Lists are contained by the curly braces, `{ }`, and the carrot symbol, `^`, in c
 ### Functions ###
 Functions in HARIS are declared in the following manner:
 ```
-[skiadas function_name [function_inputs] =
+[SKIADAS function_name [function_inputs] =
   [function_body]
 ]
 ```
-A function is contained by brackets, `[ ]`. The keywork `skiadas` is within the surrounding brackets followed by a function name (expressed as `function_name` in the example). Two sets of brackets follow, the first for the function inputs (expressed as `function_inputs` in the example) and the second for the body of the function (expressed as `function_body` in the example).
+A function is contained by brackets, `[ ]`. The keywork `SKIADAS` is within the surrounding brackets followed by a function name (expressed as `function_name` in the example). Two sets of brackets follow, the first for the function inputs (expressed as `function_inputs` in the example) and the second for the body of the function (expressed as `function_body` in the example).
 * Recursion is allowed without any syntactic changes.
 
 ### Let Statements ###
