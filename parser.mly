@@ -3,7 +3,7 @@
 %}
 
 %token <float> FLOAT
-%token VAR
+%token <string>VAR
 %token TRUE FALSE
 %token DBLSEMI 
 %token IF THEN ELSE 
@@ -16,8 +16,10 @@
 %token PAREN_L PAREN_R
 %token BRACK_L BRACK_R
 %token EQUAL
+%token LET IN 
 %nonassoc FLOAT
 %nonassoc ELSE
+%nonassoc LET IN
 %left OR AND 
 %nonassoc EQ NEQ 
 %nonassoc NOT 
@@ -45,6 +47,8 @@ expr_lst:
 
 
 expr:
+  | VAR                             { VarS $1} 
+  | LET VAR EQUAL expr IN expr     { LetS ($2, $4, $6) }
   | FLOAT                           { NumS $1 } 
   | TRUE 						                { BoolS true} 
   | FALSE 						              { BoolS false}

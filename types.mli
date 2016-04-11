@@ -5,16 +5,19 @@ exception Interp of string       (* Use for interpreter errors *)
 type exprS = NumS of float 
 		   | BoolS of bool 
 		   | IfS of exprS * exprS * exprS 
-    	   | OrS of exprS * exprS 
-    	   | AndS of exprS * exprS 
-    	   | NotS of exprS 
-    	   | ArithS of string * exprS * exprS 
-    	   | CompS of string * exprS * exprS 
-           | EqS of exprS * exprS 
-           | NeqS of exprS * exprS 
-           | TupS of exprS list 
-           | ListS of exprS list
-           | CommentS
+    	 | OrS of exprS * exprS 
+    	 | AndS of exprS * exprS 
+    	 | NotS of exprS 
+    	 | ArithS of string * exprS * exprS 
+    	 | CompS of string * exprS * exprS 
+       | EqS of exprS * exprS 
+       | NeqS of exprS * exprS 
+       | TupS of exprS list 
+       | VarS of string
+       | LetS of string * exprS * exprS
+       | ListS of exprS list
+
+
 type exprC = NumC of float 
 		   | BoolC of bool 
 		   | IfC of exprC * exprC * exprC 
@@ -22,13 +25,16 @@ type exprC = NumC of float
 		   | CompC of string * exprC * exprC 
 		   | EqC of exprC * exprC 
 		   | TupC of exprC list
+       | VarC of string
+       | LetC of string * exprC * exprC
 		   | ListC of exprC list
-		   | CommentC
+
+
 type value = Num of float 
 		   | Bool of bool 
 		   | Tup of value list
 		   | List of value list
-		   | Comment
+
 (* Environment lookup *)
 type 'a env
 val empty : 'a env

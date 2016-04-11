@@ -30,7 +30,9 @@ rule token = parse
   | float as x  { FLOAT (float_of_string x) }
   | true 		    { TRUE } 
   | false 		  { FALSE }
-  | alpha_num   { VAR }
+  | "let"       { LET }
+  | "in"        { IN }
+  | alpha_num as a   { VAR a }
   | "if"        { IF }
   | "then"      { THEN }
   | "else"      { ELSE }
