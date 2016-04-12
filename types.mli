@@ -16,7 +16,8 @@ type exprS = NumS of float
        | VarS of string
        | LetS of string * exprS * exprS
        | ListS of exprS list
-
+       | GroupS of exprS * (exprS * exprS) list
+       | FunS of string * exprS * exprS
 
 type exprC = NumC of float 
 		   | BoolC of bool 
@@ -28,8 +29,9 @@ type exprC = NumC of float
        | VarC of string
        | LetC of string * exprC * exprC
 		   | ListC of exprC list
-
-
+       | GroupC of exprC * (exprC * exprC) list
+       | FunC of string * exprC * exprC 
+       
 type value = Num of float 
 		   | Bool of bool 
 		   | Tup of value list
