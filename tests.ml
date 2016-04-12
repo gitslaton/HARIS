@@ -1,6 +1,17 @@
 open Types
 
 (*
+2 + 2;;
+2 - 2;;
+2 * 2;;
+2 / 2;;
+
+IF true THEN 5 ELSE 10;;
+IF false THEN 5 ELSE 10;;
+
+LET test = 5 IN test + test;;
+LET tEst = 5 + 5 IN test - 5;;
+
 [SKIADAS test_fun [x, y] =
 	[x + y]
 ]
