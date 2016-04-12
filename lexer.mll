@@ -30,15 +30,17 @@ rule token = parse
   | float as x  { FLOAT (float_of_string x) }
   | true 		    { TRUE } 
   | false 		  { FALSE }
-  | "let"       { LET }
-  | "in"        { IN }
+  | "LET"       { LET }
+  | "IN"        { IN }
   | alpha_num as a   { VAR a }
-  | "if"        { IF }
-  | "then"      { THEN }
-  | "else"      { ELSE }
-  | "or"        { OR }
-  | "and"       { AND }
-  | "not"       { NOT }
+  | "IF"        { IF }
+  | "THEN"      { THEN }
+  | "ELSE"      { ELSE }
+  | "OR"        { OR }
+  | "||"        { OR' }
+  | "AND"       { AND }
+  | "&&"        { AND' }
+  | "NOT"       { NOT }
   | "+"         { PLUS }
   | "-"         { MINUS }
   | "*"         { TIMES }
@@ -56,8 +58,9 @@ rule token = parse
   | "{^"        { CARROT_L }
   | "^}"        { CARROT_R }
   | "$"         { DOLLAR }
-  | "skiadas"   { FUN_DECL}
-  | "group"     { GROUP }
+  | "SKIADAS"   { FUN_DECL}
+  | "GROUP"     { GROUP }
+  | "WITH"      { WITH } 
   | ">>"        { ARROW }
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
