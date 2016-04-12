@@ -23,45 +23,45 @@ let comp = ">" | ">=" | "<" | "<="
 
 
 rule token = parse
-  | white       { token lexbuf }
-  | newline     { token lexbuf }
-  | comm        { token lexbuf }
-  | dblsemi     { DBLSEMI }
-  | float as x  { FLOAT (float_of_string x) }
-  | true 		    { TRUE } 
-  | false 		  { FALSE }
-  | "LET"       { LET }
-  | "IN"        { IN }
-  | alpha_num as a   { VAR a }
-  | "IF"        { IF }
-  | "THEN"      { THEN }
-  | "ELSE"      { ELSE }
-  | "OR"        { OR }
-  | "||"        { OR2 }
-  | "AND"       { AND }
-  | "&&"        { AND2 }
-  | "NOT"       { NOT }
-  | "+"         { PLUS }
-  | "-"         { MINUS }
-  | "*"         { TIMES }
-  | "/"         { DIVIDE } 
-  | "=="        { EQ }
-  | "!="        { NEQ }
-  | "{"         { CURLY_L }
-  | "}"         { CURLY_R }
-  | ","         { COMMA }
-  | "("         { PAREN_L }
-  | ")"         { PAREN_R }
-  | "["         { BRACK_L } 
-  | "]"         { BRACK_R }
-  | "="         { EQUAL } 
-  | "{^"        { CARROT_L }
-  | "^}"        { CARROT_R }
-  | "$"         { DOLLAR }
-  | "SKIADAS"   { FUN_DECL}
-  | "GROUP"     { GROUP }
-  | "WITH"      { WITH } 
-  | ">>"        { ARROW }
-  | comp as s   { COMPOP s }
-  | eof         { raise Eof }
-  | any         { raise Unrecognized }
+  | white                   { token lexbuf }
+  | newline                 { token lexbuf }
+  | comm                    { token lexbuf }
+  | dblsemi                 { DBLSEMI }
+  | float as x              { FLOAT (float_of_string x) }
+  | true 		                { TRUE } 
+  | false 		              { FALSE }
+  | alpha_num as a          { VAR a }
+  | "LET"                   { LET }
+  | "IN"                    { IN }
+  | "IF"                    { IF }
+  | "THEN"                  { THEN }
+  | "ELSE"                  { ELSE }
+  | "OR"                    { OR }
+  | "||"                    { OR2 }
+  | "AND"                   { AND }
+  | "&&"                    { AND2 }
+  | "NOT"                   { NOT }
+  | "+"                     { PLUS }
+  | "-"                     { MINUS }
+  | "*"                     { TIMES }
+  | "/"                     { DIVIDE } 
+  | "=="                    { EQ }
+  | "!="                    { NEQ }
+  | "{"                     { CURLY_L }
+  | "}"                     { CURLY_R }
+  | ","                     { COMMA }
+  | "("                     { PAREN_L }
+  | ")"                     { PAREN_R }
+  | "["                     { BRACK_L } 
+  | "]"                     { BRACK_R }
+  | "="                     { EQUAL } 
+  | "{^"                    { CARROT_L }
+  | "^}"                    { CARROT_R }
+  | "$"                     { DOLLAR }
+  | "SKIADAS"               { FUN_DECL}
+  | "GROUP"                 { GROUP }
+  | "WITH"                  { WITH } 
+  | ">>"                    { ARROW }
+  | comp as s               { COMPOP s }
+  | eof                     { raise Eof }
+  | any                     { raise Unrecognized }

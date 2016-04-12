@@ -1,51 +1,8 @@
-HARIS Examples
-
-+- comments -+
-
-BOOL #t, #f
-INT 5
-LIST ^INT $ INT^
-{BOOL, INT} +- tuple examples -+
-
-
-[skiadas function_name [inputs] 
-  [body]
-]
-
-let (e1) in (e2)
-
-group (e1) in
-$ (e2) >> (e3)
-
-(*
-(*LEXER*)
-  | "SKIADAS"   { FUN_DECL }
-  | "GROUP"     { GROUP }
-  | "IN"        { IN } 
-  | ">>"        { ARROWS }
-  
-(*PARSER*)
-expr_var:
-  (*something to recognize string with variable name*)
-  |  
-
-expr_func:
-  | BRACK_L FUN_DECL expr_var BRACK_L expr BRACK_R EQUAL BRACK_L expr BRACK_R BRACK_R
-  | 
-
+GROUP CODE
+(PARSER)
 expr_group:
-  | DOLLAR PAREN_L expr PAREN_R ARROWS PAREN_L expr PAREN_R               { ($3, $7) }
-  | DOLLAR PAREN_L expr PAREN_R ARROWS PAREN_L expr PAREN_R expr_group    { ($3, $7) :: $9 }
-  
-epxr:
-  (*VARIABLE ASSIGNMENT*)
-  | expr_var EQUAL expr     {  } 
-  (*GROUP STATEMENT*)
-  | GROUP PAREN_L expr PAREN_R IN expr_group      { GroupS ($3, $6) }
+  | DOLLAR PAREN_L expr PAREN_R ARROW PAREN_L expr PAREN_R               { [($3, $7)] }
+  | DOLLAR PAREN_L expr PAREN_R ARROW PAREN_L expr PAREN_R expr_group    { ($3, $7) :: $9 }
+;
 
-(*TYPES*)
-  | GroupS of exprS * ListS 
-  (*desugar to IfC???*)
-  
-
-*)
+  | GROUP PAREN_L expr PAREN_R WITH expr_group      { GroupS ($3, $6) }
