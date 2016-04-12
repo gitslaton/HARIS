@@ -56,9 +56,6 @@ rule token = parse
   | "{^"        { CARROT_L }
   | "^}"        { CARROT_R }
   | "$"         { DOLLAR }
-  | "skiadas"   { FUN_DECL}
-  | "group"     { GROUP }
-  | ">>"        { ARROW }
   | comp as s   { COMPOP s }
   | eof         { raise Eof }
   | any         { raise Unrecognized }

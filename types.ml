@@ -14,7 +14,7 @@ type exprS = NumS of float
            | NeqS of exprS * exprS
            | TupS of exprS list
            | VarS of string
-           | LetS of string * exprS * exprS
+           | LetS of exprS * exprS * exprS
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
            | FunS of string * exprS * exprS
@@ -27,7 +27,7 @@ type exprC = NumC of float
            | EqC of exprC * exprC 
            | TupC of exprC list
            | VarC of string 
-           | LetC of string * exprC * exprC           
+           | LetC of exprC * exprC * exprC           
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
            | FunC of string * exprC * exprC 
@@ -95,14 +95,14 @@ let rec desugar exprS = match exprS with
                         | NotS n -> IfC (desugar n, BoolC false, BoolC true) 
                         | OrS (o1, o2) -> IfC (desugar o1, BoolC true, IfC (desugar o2, BoolC true, BoolC false)) 
                         | AndS (a1, a2) -> IfC (desugar a1, IfC (desugar a2, BoolC true, BoolC false), BoolC false) 
-                        | ArithS (str_operator, NumS val_l, NumS val_r) -> ArithC (str_operator, NumC val_l, NumC val_r) 
-                        | CompS (str_operator, NumS val_l, NumS val_r) -> CompC (str_operator, NumC val_l, NumC val_r) 
+                        | ArithS (str_operator, val_l, val_r) -> ArithC (str_operator, desugar val_l, desugar val_r) 
+                        | CompS (str_operator, val_l, val_r) -> CompC (str_operator, desugar val_l, desugar val_r) 
                         | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
                         | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
                         | ListS list_val      -> ListC (List.map desugar list_val)
-                        | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
+                        | LetS (VarS var, expr1, expr2) -> LetC (VarC var, desugar expr1, desugar expr2)
                         | TupS list_val -> TupC (List.map desugar list_val)
-                        | VarS k-> VarC k
+                        | VarS k -> VarC k
                         | FunS (name, parameter, body) -> FunC (name, desugar parameter, desugar body)
                         | _ -> raise (Interp "desugar - Match Not Found")
 
@@ -122,10 +122,10 @@ let rec interp env r = match r with
                        | VarC k -> (match lookup k env with
                                     | Some v -> v
                                     | None -> raise (Interp "no variable"))
-                       | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
+                       | LetC (VarC var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
                        | ListC list_val 	-> List (List.map (interp env) list_val)
                        | TupC list_val -> Tup  (List.map (interp env) list_val)
-                       | FunC (name, parameter, body) -> bind name (interpret) env
+                       (*| FunC (name, parameter, body) -> bind name (interpret) env*)
 
 (*
 (* val bind :  string -> 'a -> 'a env -> 'a env *)

@@ -105,7 +105,11 @@ let t8i = evaluate (desugar (NeqS (NumS 5.0, NumS 5.0))) = Bool false
 let t8j = evaluate (desugar (NeqS (NumS 5.0, NumS 4.0))) = Bool true
 
 (*TUP TESTS*)
-let t9a = evaluate (TupC (NumC 1.0, BoolC true)) = Tup (Num 1.0, Bool true)
+(*let t9a = evaluate (TupC (NumC 1.0 :: BoolC true)) = Tup (Num 1.0, Bool true) *)
 
-(*LIST TESTS*)
-let t10a = evaluate (^10 $ 10^)
+
+
+
+(* LET TESTS *)
+let t11a = evaluate (desugar (LetS (VarS "l", BoolS true, (AndS (VarS "l", BoolS true ) )))) = Bool true
+let t11b = evaluate (desugar  (LetS (VarS "b", NumS 2.0, (ArithS ("+", VarS "b" , NumS 2.0))))) = Num 4.0

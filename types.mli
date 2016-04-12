@@ -14,7 +14,7 @@ type exprS = NumS of float
        | NeqS of exprS * exprS 
        | TupS of exprS list 
        | VarS of string
-       | LetS of string * exprS * exprS
+       | LetS of exprS * exprS * exprS
        | ListS of exprS list
        | GroupS of exprS * (exprS * exprS) list
        | FunS of string * exprS * exprS
@@ -27,7 +27,7 @@ type exprC = NumC of float
 		   | EqC of exprC * exprC 
 		   | TupC of exprC list
        | VarC of string
-       | LetC of string * exprC * exprC
+       | LetC of exprC * exprC * exprC
 		   | ListC of exprC list
        | GroupC of exprC * (exprC * exprC) list
        | FunC of string * exprC * exprC 

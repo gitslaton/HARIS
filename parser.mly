@@ -4,9 +4,7 @@
 
 %token <float> FLOAT
 %token <string>VAR
-%token ARROWS
-%token FUN_DECL
-%token GROUP
+
 %token TRUE FALSE
 %token DBLSEMI 
 %token IF THEN ELSE 
@@ -22,7 +20,6 @@
 %token LET IN 
 %nonassoc FLOAT
 %nonassoc ELSE
-%nonassoc FUN_DECL
 %nonassoc LET IN
 %left OR AND 
 %nonassoc EQ NEQ 
@@ -50,20 +47,11 @@ expr_lst:
   | headEx DOLLAR expr_lst            { $1 :: $3 }
 ;
 
-expr_group:
-  | DOLLAR PAREN_L expr PAREN_R ARROWS PAREN_L expr PAREN_R               { ($3, $7) }
-  | DOLLAR PAREN_L expr PAREN_R ARROWS PAREN_L expr PAREN_R expr_group    { ($3, $7) :: $9 }
-;
 
-expr_func:
-  | FUN_DECL expr BRACK_L expr BRACK_R EQUAL BRACK_L expr BRACK_R         { FunS ($2, $4, $8) }
-  | FUN_DECL expr EQUAL BRACK_L expr BRACK_R                              { FunS ($2, $5) }
-;
 
 expr:
   | VAR                                           { VarS $1 } 
-  | LET VAR EQUAL expr IN expr                    { LetS ($2, $4, $6) }
-  | VAR EQUAL expr                                { VarS ($3) }
+  | LET expr EQUAL expr IN expr                    { LetS ($2, $4, $6) }
   | FLOAT                                         { NumS $1 } 
   | TRUE 						                              { BoolS true } 
   | FALSE 						                            { BoolS false }
@@ -82,6 +70,5 @@ expr:
   | expr NEQ expr 				                        { NeqS ($1, $3) }
   | CARROT_L CARROT_R                             { ListS [] }
   | CARROT_L expr_lst CARROT_R                    { ListS ($2) }
-  | GROUP PAREN_L expr PAREN_R IN expr_group      { GroupS ($3, $6) }
-  | BRACK_L expr_func BRACK_R                     { FunS ($2) }
+
 ;
