@@ -37,9 +37,9 @@ rule token = parse
   | "THEN"      { THEN }
   | "ELSE"      { ELSE }
   | "OR"        { OR }
-  | "||"        { OR' }
+  | "||"        { OR2 }
   | "AND"       { AND }
-  | "&&"        { AND' }
+  | "&&"        { AND2 }
   | "NOT"       { NOT }
   | "+"         { PLUS }
   | "-"         { MINUS }

@@ -17,7 +17,7 @@ type exprS = NumS of float
            | LetS of string * exprS * exprS
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
-           | FunS of string * exprS * exprS
+           | FunS of string * exprS list * exprS
            | FunS' of string * exprS
 
 type exprC = NumC of float 
@@ -31,7 +31,7 @@ type exprC = NumC of float
            | LetC of string * exprC * exprC           
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
-           | FunC of string * exprC * exprC 
+           | FunC of string * exprC list * exprC 
            | FunC' of string * exprC
 
 type value = Num of float 

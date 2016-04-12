@@ -72,10 +72,10 @@ match expr1 in
 HARIS has a `group` statement for pattern matching.
 The `group` statement is expressed in the following manner:
 ```
-group (expr1) in
+GROUP (expr1) WITH
 $ (expr2) >> (expr3)
 ```
-The `group`statement matches `expr1`, which must be surrounded by `( )`, with cases listed sequentially (denoted by the `$`), such as `expr2`. Whenever `expr1` matches a case, it runs the code for that case, such as `expr3` in the above example; the `>>` symbols separate the match expression from the expression that needs to be run.
+The `GROUP`statement matches `expr1`, which must be surrounded by `( )`, with cases listed sequentially (denoted by the `$`), such as `expr2`. Whenever `expr1` matches a case, it runs the code for that case, such as `expr3` in the above example; the `>>` symbols separate the match expression from the expression that needs to be run.
 
 
 ### Comments ###
