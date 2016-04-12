@@ -18,6 +18,7 @@ type exprS = NumS of float
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
            | FunS of string * exprS * exprS
+           | FunS' of string * exprS
 
 type exprC = NumC of float 
            | BoolC of bool 
@@ -31,6 +32,7 @@ type exprC = NumC of float
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
            | FunC of string * exprC * exprC 
+           | FunC' of string * exprC
 
 type value = Num of float 
            | Bool of bool 
@@ -87,7 +89,18 @@ let compEval str_operator val_l val_r =
                                  | ">=" -> Bool (val_l' >= val_r')
                                  | _ -> raise (Interp "Not an Operator"))
   | _ -> raise (Interp "Not Both Nums") 
-
+(*
+   Write a function `map` that takes as input a function `'a -> 'b` and a `'a stream`,
+   and produces a `'b stream` whose values are the results of applying the function
+   to the corresponding values of the 'a stream. For example if st is the stream
+   1, 2, 3, ... and the function is the squaring function, the resulting stream would
+   be 1, 4, 9, ...
+   It should have type `('a -> 'b) -> 'a stream -> 'b stream`.
+*)
+(*ISSUES: has type ('a * 'a stream -> 'b) -> 'a stream -> 'b stream*)
+let rec map f (St th) =
+   let (v, st) = th () in
+      St (fun () -> (f v, map f st))
 let eqEval val_l val_r = 
   match (val_l, val_r) with 
   | (Num val_l', Num val_r') -> Bool (val_l' = val_r')
@@ -113,7 +126,9 @@ let rec desugar exprS = match exprS with
                         | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
                         | TupS list_val -> TupC (List.map desugar list_val)
                         | VarS k-> VarC k
+                        (*ISSUES, ISSUES, ISSUES*)                        
                         | FunS (name, parameter, body) -> FunC (name, desugar parameter, desugar body)
+                        | FunS' (name, body) -> Fun
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
@@ -134,7 +149,10 @@ let rec interp env r = match r with
                        | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
                        | ListC list_val 	-> List (List.map (interp env) list_val)
                        | TupC list_val -> Tup  (List.map (interp env) list_val)
-                       | FunC (name, parameter, body) -> bind name (interpret) env
+                       (*ISSUES, ISSUES, ISSUES*)
+                       | FunC (name, parameters, body) -> let parameters' = interpret parameters env in
+                                                              bind name (interpret body env) env
+                       | FunC' (name, body) -> bind name (interpret body env) env
 
 
 (* evaluate : exprC -> val *)
