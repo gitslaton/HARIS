@@ -32,7 +32,7 @@ type exprC = NumC of float
 		   | ListC of exprC list
        | GroupC of exprC * (exprC * exprC) list
        | FunC of string * exprC * exprC 
-       | FunS of string * exprC
+       | FunC' of string * exprC
        
 type value = Num of float 
 		   | Bool of bool 
