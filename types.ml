@@ -1,7 +1,7 @@
 exception Desugar of string      (* Use for desugarer errors *)
 exception Interp of string       (* Use for interpreter errors *)
 
-(* You will need to add more cases here. *)
+
 type exprS = NumS of float 
            | BoolS of bool 
            | IfS of exprS * exprS * exprS 
@@ -18,7 +18,7 @@ type exprS = NumS of float
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
            | FunS of string * exprS * exprS
-(* You will need to add more cases here. *)
+
 type exprC = NumC of float 
            | BoolC of bool 
            | IfC of exprC * exprC * exprC 
@@ -32,7 +32,6 @@ type exprC = NumC of float
            | GroupC of exprC * (exprC * exprC) list
            | FunC of string * exprC * exprC 
 
-(* You will need to add more cases here. *)
 type value = Num of float 
            | Bool of bool 
            | Tup of value list
@@ -51,11 +50,22 @@ let rec lookup str env = match env with
 let bind str v env = (str, v) :: env
 
 
+(*HELPER METHODS*)
 (*
-   HELPER METHODS
-   You may be asked to add methods here. You may also choose to add your own
-   helper methods here.
+let rec map function lst = 
+
+
+let rec filter fun_bool lst = 
+
+
+let rec foldr fun_a_b lst x = 
+
+
+let rec foldl fun_a_b x lst = 
+
+
 *)
+
 let arithEval str_operator val_l val_r = 
   match (val_l, val_r) with
   | (Num val_l', Num val_r') -> (match str_operator with
@@ -84,9 +94,9 @@ let eqEval val_l val_r =
   | (Bool val_l', Bool val_r') -> Bool (val_l' = val_r')
   | _ -> Bool false 
 
-(* INTERPRETER *)
 
-(* You will need to add cases here. *)
+
+(* INTERPRETER *)
 (* desugar : exprS -> exprC *)
 let rec desugar exprS = match exprS with
                         | NumS i -> NumC i
@@ -107,7 +117,6 @@ let rec desugar exprS = match exprS with
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
-(* You will need to add cases here. *)
 (* interp : Value env -> exprC -> value *)
 let rec interp env r = match r with
                        | NumC i        -> Num i
@@ -127,17 +136,10 @@ let rec interp env r = match r with
                        | TupC list_val -> Tup  (List.map (interp env) list_val)
                        | FunC (name, parameter, body) -> bind name (interpret) env
 
-(*
-(* val bind :  string -> 'a -> 'a env -> 'a env *)
-let bind str v env = (str, v) :: env
-*)
 
 (* evaluate : exprC -> val *)
 let evaluate exprC = exprC |> interp []
 
-
-
-(* You will need to add cases to this function as you add new value types. *)
 let rec valToString r = 
   let rec list_to_string lst t =
     match t with
@@ -154,5 +156,3 @@ let rec valToString r =
   | Bool b 			    -> string_of_bool b
   | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
   | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
-
-
