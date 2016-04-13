@@ -39,11 +39,11 @@ type value = Num of float
            | Bool of bool 
            | Tup of value list
            | List of value list 
-           | Closure of value env * exprC
 
 
 type 'a env = (string * 'a) list
 let empty = []
+
 
 (* lookup : string -> 'a env -> 'a option *)
 let rec lookup str env = match env with
@@ -53,8 +53,9 @@ let rec lookup str env = match env with
 (* val bind :  string -> 'a -> 'a env -> 'a env *)
 let bind str v env = (str, v) :: env
 
+
 (*LIST THINGS -> PREPEND/EMPTY/TESTING IF NULL/GETTING HEAD/GETTING TAIL*)
-(*
+(**)
 let prepend lst element = 
     element :: lst
     
@@ -73,10 +74,11 @@ let rec lst_tail lst =
     | [] -> raise (Lists "list is empty")
     | element :: [] -> element
     | element :: rest -> lst_tail rest
-*)
+(**)
+
 
 (*MAP/FILTER/FOLDR/FOLDL*)
-(*
+(**)
 let rec map fun_x lst = 
     match lst with
     | [] -> []
@@ -98,7 +100,7 @@ let rec foldl fun_a_b x lst =
     match lst with
     | [] -> x
     | element :: rest -> foldl fun_a_b (fun_a_b x element) rest
-*)
+(**)
 
 
 (*HELPER FUNCTIONS*)
@@ -129,13 +131,6 @@ let eqEval val_l val_r =
   | (Num val_l', Num val_r') -> Bool (val_l' = val_r')
   | (Bool val_l', Bool val_r') -> Bool (val_l' = val_r')
   | _ -> Bool false 
-
-(*
-let rec desugar_lst lst =
-  match lst with
-  | [] -> []
-  | element :: rest -> desugar element :: rest
-*)
 
 
 (* INTERPRETER *)
@@ -171,37 +166,20 @@ let rec interp env r = match r with
                        | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
-                       (*ISSUES, ISSUES, ISSUES*)
-                       (*
-                        Somehow we have to take care of the parameters...
-                        Parameters are an expr list
-                       *)
-                       | FunC (fun_name, parameter, body) -> Closure (env, r)
+                       | ListC list_val  -> List (List.map (interp env) list_val)
+                       | LetC (VarC var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
+                       | TupC list_val -> Tup  (List.map (interp env) list_val)    
+                       | FunC (fun_name, parameter, body) -> interp env body (*Closure (env, r)*)
                        | FunC2 (VarC fun_name, body) -> interp (bind fun_name (interp env body) env) (BoolC false)
                        | VarC k -> (match lookup k env with
                                     | Some v -> v
                                     | None -> raise (Interp "no variable"))
-                       | LetC (VarC var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
-                       | ListC list_val 	-> List (List.map (interp env) list_val)
-                       | TupC list_val -> Tup  (List.map (interp env) list_val)    
                        | _ -> raise (Interp "interp - Match Not Found")                
-
-
-
-(*
-(* lookup : string -> 'a env -> 'a option *)
-let rec lookup str env = match env with
-  | []          -> None
-  | (s,v) :: tl -> if s = str then Some v else lookup str tl 
-
-
-(* val bind :  string -> 'a -> 'a env -> 'a env *)
-let bind str v env = (str, v) :: env
-*)
 
 
 (* evaluate : exprC -> val *)
 let evaluate exprC = exprC |> interp []
+
 
 let rec valToString r = 
   let rec list_to_string lst t =

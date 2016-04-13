@@ -29,7 +29,7 @@ type exprC = NumC of float
            | TupC of exprC list
            | VarC of string
            | LetC of exprC * exprC * exprC
-           |  ListC of exprC list
+           | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
            | FunC of exprC * exprC * exprC 
            | FunC2 of exprC * exprC
