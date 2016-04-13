@@ -1,5 +1,6 @@
-exception Desugar of string      (* Use for desugarer errors *)
-exception Interp of string       (* Use for interpreter errors *)
+exception Desugar of string      (* Used for desugarer errors *)
+exception Interp of string       (* Used for interpreter errors *)
+exception Lists of string        (* Used for list function errors *)
 
 
 type exprS = NumS of float 
@@ -52,6 +53,27 @@ let rec lookup str env = match env with
 (* val bind :  string -> 'a -> 'a env -> 'a env *)
 let bind str v env = (str, v) :: env
 
+(*LIST THINGS -> PREPEND/EMPTY/TESTING IF NULL/GETTING HEAD/GETTING TAIL*)
+(*
+let prepend lst element = 
+    element :: lst
+    
+let test_null lst = 
+    match lst with 
+    | [] -> true
+    | _ -> false
+
+let lst_head lst = 
+    match lst with 
+    | [] -> raise (Lists "list is empty") 
+    | element :: rest -> element 
+    
+let rec lst_tail lst = 
+    match lst with
+    | [] -> raise (Lists "list is empty")
+    | element :: [] -> element
+    | element :: rest -> lst_tail rest
+*)
 
 (*MAP/FILTER/FOLDR/FOLDL*)
 (*
