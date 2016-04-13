@@ -53,22 +53,33 @@ let rec lookup str env = match env with
 let bind str v env = (str, v) :: env
 
 
-(*HELPER METHODS*)
+(*MAP/FILTER/FOLDR/FOLDL*)
 (*
-let rec map function lst = 
-
+let rec map fun_x lst = 
+    match lst with
+    | [] -> []
+    | element :: rest -> fun_x element :: map fun_x rest
 
 let rec filter fun_bool lst = 
-
+    match lst with
+    | [] -> []
+    | element :: rest -> (match fun_bool element with
+                          | true -> element :: filter fun_bool rest
+                          | false -> filter fun_bool rest)
 
 let rec foldr fun_a_b lst x = 
-
+    match lst with
+    | [] -> x
+    | element :: rest -> fun_a_b element (foldr fun_a_b rest x)
 
 let rec foldl fun_a_b x lst = 
-
-
+    match lst with
+    | [] -> x
+    | element :: rest -> foldl fun_a_b (fun_a_b x element) rest
 *)
 
+
+(*HELPER FUNCTIONS*)
 let arithEval str_operator val_l val_r = 
   match (val_l, val_r) with
   | (Num val_l', Num val_r') -> (match str_operator with
