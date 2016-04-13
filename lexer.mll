@@ -25,12 +25,10 @@ let comp = ">" | ">=" | "<" | "<="
 rule token = parse
   | white                   { token lexbuf }
   | newline                 { token lexbuf }
-  | comm                    { token lexbuf }
   | dblsemi                 { DBLSEMI }
   | float as x              { FLOAT (float_of_string x) }
   | true 		                { TRUE } 
   | false 		              { FALSE }
-  | alpha_num as a          { VAR a }
   | "LET"                   { LET }
   | "IN"                    { IN }
   | "IF"                    { IF }
@@ -63,6 +61,8 @@ rule token = parse
   | "WITH"                  { WITH } 
   | ">>"                    { ARROW }
   | comp as s               { COMPOP s }
+  | comm                    { token lexbuf }
   | eof                     { raise Eof }
+  | alpha_num as a          { VAR a }
   | any                     { raise Unrecognized }
 
