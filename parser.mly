@@ -3,15 +3,18 @@
 %}
 
 
+%token <string> VAR 
 %token <float> FLOAT 
-%token <string>VAR 
-%token <string> COMPOP 
+%token <string> COMPOP
 %token ARROW 
 %token FUN_DECL 
 %token GROUP WITH 
 %token TRUE FALSE 
 %token DBLSEMI 
 %token IF THEN ELSE 
+%token LET
+%token EQUAL
+%token IN
 %token OR OR2 AND AND2 NOT 
 %token PLUS MINUS TIMES DIVIDE 
 %token EQ NEQ 
@@ -19,17 +22,17 @@
 %token CARROT_L DOLLAR CARROT_R 
 %token PAREN_L PAREN_R 
 %token BRACK_L BRACK_R 
-%token EQUAL 
-%token LET IN 
-%nonassoc FLOAT 
-%nonassoc LET IN 
+%nonassoc LET 
+%nonassoc IN 
+%nonassoc FLOAT
 %nonassoc ELSE 
 %left OR OR2 AND AND2 
 %nonassoc EQ NEQ 
 %nonassoc NOT 
-%nonassoc COMPOP 
+%nonassoc COMPOP  
 %left PLUS MINUS 
 %left TIMES DIVIDE 
+
 
 
 %start main
@@ -73,7 +76,7 @@ expr:
   | CURLY_L expr_lst CURLY_R                                                 { TupS $2 }
   | CARROT_L CARROT_R                                                        { ListS [] }
   | CARROT_L expr_lst CARROT_R                                               { ListS ($2) }
-  | LET expr EQUAL expr IN expr                                               { LetS ($2, $4, $6) }
+  | LET VAR EQUAL expr IN expr                                               { LetS (VarS $2, $4, $6) }
   | FUN_DECL expr BRACK_L expr BRACK_R EQUAL BRACK_L expr BRACK_R             { FunS ($2, $4, $8) }
   | FUN_DECL expr EQUAL BRACK_L expr BRACK_R                                  { FunS2 ($2, $5) }
 ;

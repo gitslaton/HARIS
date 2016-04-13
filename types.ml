@@ -38,6 +38,7 @@ type value = Num of float
            | Bool of bool 
            | Tup of value list
            | List of value list 
+           | Closure of value env * exprC
 
 
 type 'a env = (string * 'a) list
@@ -142,7 +143,7 @@ let rec interp env r = match r with
                         Somehow we have to take care of the parameters...
                         Parameters are an expr list
                        *)
-                       | FunC (VarC fun_name, parameter, body) -> interp (bind fun_name (interp env body) env) parameter 
+                       | FunC (fun_name, parameter, body) -> Closure (env, r)
                        | FunC2 (VarC fun_name, body) -> interp (bind fun_name (interp env body) env) (BoolC false)
                        | VarC k -> (match lookup k env with
                                     | Some v -> v

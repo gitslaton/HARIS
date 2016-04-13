@@ -3,12 +3,12 @@ exception Interp of string       (* Use for interpreter errors *)
 
 
 type exprS = NumS of float 
-	      | BoolS of bool 
-	      | IfS of exprS * exprS * exprS 
- 	      | OrS of exprS * exprS 
- 	      | AndS of exprS * exprS 
- 	      | NotS of exprS 
- 	      | ArithS of string * exprS * exprS 
+           | BoolS of bool 
+           | IfS of exprS * exprS * exprS 
+           | OrS of exprS * exprS 
+           | AndS of exprS * exprS 
+           | NotS of exprS 
+           | ArithS of string * exprS * exprS 
            | CompS of string * exprS * exprS 
            | EqS of exprS * exprS 
            | NeqS of exprS * exprS 
@@ -19,25 +19,25 @@ type exprS = NumS of float
            | GroupS of exprS * (exprS * exprS) list
            | FunS of exprS * exprS * exprS
            | FunS2 of exprS * exprS
-
+ 
 type exprC = NumC of float 
-	      | BoolC of bool 
-	      | IfC of exprC * exprC * exprC 
-	      | ArithC of string  * exprC * exprC 
-	      | CompC of string * exprC * exprC 
-	      | EqC of exprC * exprC 
-	      | TupC of exprC list
+           | BoolC of bool 
+           | IfC of exprC * exprC * exprC 
+           | ArithC of string  * exprC * exprC 
+           | CompC of string * exprC * exprC 
+           | EqC of exprC * exprC 
+           | TupC of exprC list
            | VarC of string
            | LetC of exprC * exprC * exprC
-	      | ListC of exprC list
+           |  ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
            | FunC of exprC * exprC * exprC 
            | FunC2 of exprC * exprC
 
 type value = Num of float 
            | Bool of bool 
-	      | Tup of value list
-	      | List of value list
+           | Tup of value list
+           | List of value list
 
 (* Environment lookup *)
 type 'a env
