@@ -14,11 +14,12 @@ type exprS = NumS of float
            | NeqS of exprS * exprS 
            | TupS of exprS list 
            | VarS of string
-           | LetS of exprS * exprS * exprS
+           | LetS of string * exprS * exprS
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
-           | FunS of exprS * exprS * exprS
-           | FunS2 of exprS * exprS
+           | FunS of string* exprS * exprS
+           | FunS2 of string * exprS
+           | CallS of string * exprS
  
 type exprC = NumC of float 
            | BoolC of bool 
@@ -28,11 +29,12 @@ type exprC = NumC of float
            | EqC of exprC * exprC 
            | TupC of exprC list
            | VarC of string
-           | LetC of exprC * exprC * exprC
+           | LetC of string * exprC * exprC
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
-           | FunC of exprC * exprC * exprC 
-           | FunC2 of exprC * exprC
+           | FunC of string * exprC * exprC 
+           | FunC2 of string * exprC
+           | CallC of string * exprC
 
 type value = Num of float 
            | Bool of bool 
