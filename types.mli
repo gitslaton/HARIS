@@ -17,9 +17,9 @@ type exprS = NumS of float
            | LetS of string * exprS * exprS
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
-           | FunS of string* exprS * exprS
+           | FunS of string * string * exprS
            | FunS2 of string * exprS
-           | CallS of string * exprS
+           | CallS of exprS * exprS
  
 type exprC = NumC of float 
            | BoolC of bool 
@@ -32,14 +32,11 @@ type exprC = NumC of float
            | LetC of string * exprC * exprC
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
-           | FunC of string * exprC * exprC 
+           | FunC of string * string * exprC 
            | FunC2 of string * exprC
-           | CallC of string * exprC
+           | CallC of exprC * exprC
 
-type value = Num of float 
-           | Bool of bool 
-           | Tup of value list
-           | List of value list
+
 
 (* Environment lookup *)
 type 'a env
@@ -47,6 +44,11 @@ val empty : 'a env
 val lookup : string -> 'a env -> 'a option
 val bind :  string -> 'a -> 'a env -> 'a env
 
+type value = Num of float 
+           | Bool of bool 
+           | Tup of value list
+           | List of value list
+           | Closure of value env * exprC
 
 (* Interpreter steps *)
 val desugar : exprS -> exprC 

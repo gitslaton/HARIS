@@ -20,7 +20,7 @@ type exprS = NumS of float
            | GroupS of exprS * (exprS * exprS) list
            | FunS of string  * string * exprS
            | FunS2 of string * exprS
-           | CallS of string * exprS
+           | CallS of exprS * exprS
 
 type exprC = NumC of float 
            | BoolC of bool 
@@ -35,15 +35,17 @@ type exprC = NumC of float
            | GroupC of exprC * (exprC * exprC) list
            | FunC of string * string * exprC 
            | FunC2 of string * exprC
-           | CallC of string * exprC
+           | CallC of exprC * exprC
+
+
+type 'a env = (string * 'a) list
 
 type value = Num of float 
            | Bool of bool 
            | Tup of value list
            | List of value list 
+           | Closure of value env * exprC
 
-
-type 'a env = (string * 'a) list
 let empty = []
 
 
@@ -153,8 +155,8 @@ let rec desugar exprS = match exprS with
                         | TupS list_val -> TupC (List.map desugar list_val)
                         | FunS (name, parameter, body) -> FunC (name, parameter, desugar body)
                         | FunS2 (parameter, body) -> FunC2 (parameter, desugar body)
-                        | CallS (fun_name, val) -> CallC (fun_name, desugar val)
-                        | VarS k-> VarC k
+                        | CallS (on_fun, arg) -> CallC (desugar on_fun, desugar arg)
+                        | VarS k -> VarC k
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
@@ -170,15 +172,16 @@ let rec interp env r = match r with
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
                        | ListC list_val  -> List (List.map (interp env) list_val)
-                       | LetC (VarC var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
+                       | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
                        | TupC list_val -> Tup  (List.map (interp env) list_val)    
                        | FunC (fun_name, parameter, body) -> Closure (env, r)
                        | FunC2 (parameter, body) -> Closure (env, r)
-                       | CallC (func, val) -> let c = interp env func in
-                                              let v = interp env val
-                                              match c with
+                       | CallC (on_fun, arg) -> let c = interp env on_fun in
+                                              let v = interp env arg in 
+                                              (match c with
                                               | Closure (env', FunC (name, para, body)) -> interp (bind name c (bind para v env')) body
                                               | Closure (env', FunC2 (para, body)) -> interp (bind para v env') body
+                                              | _ -> raise (Interp "Cannot run on non-closure"))
                        | VarC k -> (match lookup k env with
                                     | Some v -> v
                                     | None -> raise (Interp "no matching variable found"))
@@ -205,3 +208,4 @@ let rec valToString r =
   | Bool b 			    -> string_of_bool b
   | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
   | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
+  | _               -> raise (Interp "not valid to express as string")

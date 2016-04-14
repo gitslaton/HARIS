@@ -122,5 +122,10 @@ let t8j = evaluate (desugar (NeqS (NumS 5.0, NumS 4.0))) = Bool true
 
 
 (* LET TESTS *)
-let t11a = evaluate (desugar (LetS (VarS "l", BoolS true, (AndS (VarS "l", BoolS true ) )))) = Bool true
-let t11b = evaluate (desugar  (LetS (VarS "b", NumS 2.0, (ArithS ("+", VarS "b", NumS 2.0))))) = Num 4.0
+let t11a = evaluate (desugar (LetS ("l", BoolS true, (AndS (VarS "l", BoolS true ) )))) = Bool true
+let t11b = evaluate (desugar  (LetS ("b", NumS 2.0, (ArithS ("+", VarS "b", NumS 2.0))))) = Num 4.0
+
+(*FUNC TESTS*)
+
+let t12a = evaluate (desugar (CallS (FunS ("f", "x", (NumS 1.0)), NumS 3.0))) = Num 1.0
+let t12b = evaluate (desugar (CallS (FunS ("f", "x", (ArithS ("+", VarS "x", NumS 1.0))), NumS 3.0))) = Num 4.0
