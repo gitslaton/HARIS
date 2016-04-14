@@ -20,6 +20,11 @@ type exprS = NumS of float
            | FunS of string * string * exprS
            | FunS2 of string * exprS
            | CallS of exprS * exprS
+           | HeadS of exprS 
+           | TailS of exprS 
+           | ListElS of exprS * exprS
+           | ListCarS of exprS
+           | ListCdrS of exprS
  
 type exprC = NumC of float 
            | BoolC of bool 
@@ -35,7 +40,11 @@ type exprC = NumC of float
            | FunC of string * string * exprC 
            | FunC2 of string * exprC
            | CallC of exprC * exprC
-
+           | HeadC of exprC 
+           | TailC of exprC 
+           | ListElC of exprC * exprC 
+           | ListCarC of exprC
+           | ListCdrC of exprC
 
 
 (* Environment lookup *)

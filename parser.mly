@@ -22,6 +22,8 @@
 %token CARROT_L DOLLAR CARROT_R 
 %token PAREN_L PAREN_R 
 %token BRACK_L BRACK_R 
+%token DOT
+%token HEAD TAIL CAR CDR
 %nonassoc LET 
 %nonassoc IN 
 %nonassoc FLOAT
@@ -77,7 +79,12 @@ expr:
   | CARROT_L expr_lst CARROT_R                                               { ListS ($2) }
   | VAR                                                                      { VarS $1 }
   | LET VAR EQUAL expr IN expr                                               { LetS ($2, $4, $6) }
-  | FUN_DECL VAR BRACK_L VAR BRACK_R EQUAL BRACK_L expr BRACK_R            { FunS ($2, $4, $8) }
-  | FUN_DECL VAR EQUAL BRACK_L expr BRACK_R                                 { FunS2 ($2, $5) }
+  | BRACK_L FUN_DECL VAR BRACK_L expr BRACK_R EQUAL BRACK_L expr BRACK_R BRACK_R         { FunS ($3, $5, $9) }
+  | BRACK_L FUN_DECL VAR EQUAL BRACK_L expr BRACK_R BRACK_R                              { FunS2 ($3, $6) }
+  | expr DOT HEAD														 	 { HeadS ($1) } 
+  | expr DOT TAIL															 { TailS ($1) } 
+  | expr DOT FLOAT 														 	 { ListElS ($1, $3) } 
+  | expr DOT CAR 														 	 { ListCarS ($1) } 
+  | expr DOT CDR 														 	 { ListCdrS ($1) } 
 ;
 

@@ -12,16 +12,21 @@ type exprS = NumS of float
            | ArithS of string * exprS * exprS 
            | CompS of string * exprS * exprS 
            | EqS of exprS * exprS 
-           | NeqS of exprS * exprS
-           | TupS of exprS list
+           | NeqS of exprS * exprS 
+           | TupS of exprS list 
            | VarS of string
            | LetS of string * exprS * exprS
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
-           | FunS of string  * string * exprS
+           | FunS of string* exprS * exprS
            | FunS2 of string * exprS
            | CallS of exprS * exprS
-
+           | HeadS of exprS 
+           | TailS of exprS 
+           | ListElS of exprS * exprS 
+           | ListCarS of exprS
+           | ListCdrS of exprS
+ 
 type exprC = NumC of float 
            | BoolC of bool 
            | IfC of exprC * exprC * exprC 
@@ -29,16 +34,18 @@ type exprC = NumC of float
            | CompC of string * exprC * exprC 
            | EqC of exprC * exprC 
            | TupC of exprC list
-           | VarC of string 
-           | LetC of string * exprC * exprC           
+           | VarC of string
+           | LetC of string * exprC * exprC
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
-           | FunC of string * string * exprC 
+           | FunC of string * exprC * exprC 
            | FunC2 of string * exprC
            | CallC of exprC * exprC
-
-
-type 'a env = (string * 'a) list
+           | HeadC of exprC 
+           | TailC of exprC 
+           | ListElC of exprC * exprC 
+           | ListCarC of exprC
+           | ListCdrC of exprC
 
 type value = Num of float 
            | Bool of bool 
@@ -78,6 +85,22 @@ let rec lst_tail lst =
     | [] -> raise (Lists "list is empty")
     | element :: [] -> element
     | element :: rest -> lst_tail rest
+
+let rec lst_num lst num =
+    match (lst, num) with 
+    | ([], num') -> raise (Lists "list out of bounds")
+    | (element :: rest, num') -> if num' = 0
+                                 then element 
+                                 else lst_num rest (num' - 1)
+
+let lst_car lst = 
+    lst_head lst
+
+let lst_cdr lst = 
+    match lst with
+    | [] -> raise (Lists "list is empty")
+    | element :: [] -> raise (Lists "list does not have enough elements")
+    | element :: element' :: rest -> element'
 (**)
 
 
@@ -157,6 +180,12 @@ let rec desugar exprS = match exprS with
                         | FunS2 (parameter, body) -> FunC2 (parameter, desugar body)
                         | CallS (on_fun, arg) -> CallC (desugar on_fun, desugar arg)
                         | VarS k -> VarC k
+                        | VarS k-> VarC k
+                        | HeadS lst -> HeadC lst
+                        | TailS lst -> TailS lst
+                        | ListElS lst num -> ListElC lst num
+                        | ListCarS lst -> ListCarC lst
+                        | ListCdrS lst -> ListCdrC lst
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
@@ -185,6 +214,11 @@ let rec interp env r = match r with
                        | VarC k -> (match lookup k env with
                                     | Some v -> v
                                     | None -> raise (Interp "no matching variable found"))
+                       | HeadC lst -> interp env (lst_head lst)
+                       | TailC lst -> interp env (lst_tail lst)
+                       | ListElC lst num -> interp env (lst_num lst num)
+                       | ListCarC lst -> interp env (lst_car lst)
+                       | ListCdrC lst -> interp env (lst_cdr lst)
                        | _ -> raise (Interp "interp - Match Not Found")                
 
 

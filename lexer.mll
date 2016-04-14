@@ -60,6 +60,16 @@ rule token = parse
   | "GROUP"                 { GROUP }
   | "WITH"                  { WITH } 
   | ">>"                    { ARROW }
+  | "."                     { DOT }
+  | "HEAD"                  { HEAD }
+  | "TAIL"                  { TAIL }
+  | "EMPTY"                 { EMPTY }
+  | "CAR"                   { CAR }
+  | "CDR"                   { CDR }
+  | "MAP"                   { MAP }
+  | "FILTER"                { FILTER }
+  | "FOLDR"                 { FOLDR }
+  | "FOLDL"                 { FOLDL }
   | comp as s               { COMPOP s }
   | comm                    { token lexbuf }
   | eof                     { raise Eof }
