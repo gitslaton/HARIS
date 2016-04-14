@@ -44,6 +44,33 @@ Lists are contained by the curly braces, `{ }`, and the carrot symbol, `^`, comb
 {^ 1. $ 1.5 $ 2. ^}
 ```
 
+####List Functions####
+HARIS has eight built-in list functions to help work with and change lists.
+* map
+ * Parameters: function that takes one input; list
+ * Return: new list containing all the elements from the inputed list with the inputed function applied
+* filter
+ * Parameters: function that takes one input and returns a boolean; list
+ * Return: new list containing all the elements from the inputed list that returned true when applied to the inputed function
+* foldr
+ * Parameters: function that takes two inputs input; list; element
+ * Return: list that accumulates using the inputed function starting from the right (or end) of the inputed list and using the element 
+* foldl
+ * Parameters: function that takes two input; element; list
+ * Return: list that accumulates using the inputed function starting from the left (or beginning) of the inputed list and using the element 
+* prepend
+ * Parameters: list; element to prepend to list
+ * Return: list with element prepended to the front of the list
+* test_null
+ * Parameters: list
+ * Return: true if the list is empty/null; else false
+* lst_head
+ * Parameters: list
+ * Return: first element (or head) of the list
+* lst_tail
+ * Parameters: list
+ * Return: last element (or tail) of the list
+
 ### Functions ###
 Functions in HARIS are declared in the following manner:
 ```
@@ -58,6 +85,12 @@ A function is contained by brackets, `[ ]`. The keywork `SKIADAS` is first withi
   [function_body]
 ]
 ```
+####Calling a Function####
+Calling a function is done in the following manner:
+```
+function_name [function_inputs]
+```
+You do not need the keyword `SKIADAS` to call a function.
 
 ### Let Statements ###
 Let statements allow a user to have run an expression, `expr1`, and have the result of that expression used when running another expression, `expr2`. Let statements in HARIS look like the following:
@@ -68,21 +101,6 @@ LET expr1 IN expr2
 LET expr1 IN
   expr2
 ```
-
-### Pattern Matching ###
-OCAML has a pattern matching mechanism known as the `match` statement. The following code is an example:
-```
-match expr1 in
-| expr2 -> expr3
-```
-HARIS has a `GROUP` statement for pattern matching.
-The `GROUP` statement is expressed in the following manner:
-```
-GROUP (expr1) WITH
-$ (expr2) >> (expr3)
-```
-The `GROUP`statement matches `expr1`, which must be surrounded by `( )`, with cases listed sequentially (denoted by the `$`), such as `expr2`. Whenever `expr1` matches an expression such as `epxr2`, it runs the code for that case, such as `expr3` in the above example. Double right-facing arrows, `>>`, separate the first expression from the correlating expression that needs to be run.
-
 
 ### Comments ###
 Commenting in HARIS uses the combination of the `+` symbol and the `-` symbol, creating `+-`. To end a comment, whether on one or multiple lines, use the reverse, as in `-+`.
