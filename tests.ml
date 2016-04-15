@@ -85,8 +85,8 @@ let t6h = evaluate (IfC (BoolC false,
 						 ArithC ("/", NumC 5.0, NumC 5.0), 
 						 ArithC ("*", NumC 5.0, NumC 5.0))) = Num 25.0
 let t6i = evaluate (desugar (IfS (BoolS false, 
-						 	 	  ArithS ("/", NumS 5.0, NumS 5.0), 
-						 		  ArithS ("*", NumS 5.0, NumS 5.0)))) = Num 25.0 
+						 ArithS ("/", NumS 5.0, NumS 5.0), 
+						 ArithS ("*", NumS 5.0, NumS 5.0)))) = Num 25.0 
 
 
 (*COMPARISON OPERATORS TESTS*)
@@ -103,8 +103,8 @@ let t7h = evaluate (IfC (BoolC false,
 						 CompC ("<", NumC 5.0, NumC 5.0), 
 						 CompC ("<=", NumC 5.0, NumC 5.0))) = Bool true 
 let t7e = evaluate (desugar (IfS (BoolS true, 
-						 		  CompS (">", NumS 5.0, NumS 5.0), 
-						 		  CompS (">=", NumS 5.0, NumS 5.0)))) = Bool false 
+					   CompS (">", NumS 5.0, NumS 5.0), 
+						 CompS (">=", NumS 5.0, NumS 5.0)))) = Bool false 
 
 
 (*EQUALITY TESTS*)
@@ -118,8 +118,24 @@ let t8j = evaluate (desugar (NeqS (NumS 5.0, NumS 4.0))) = Bool true
 (*TUP TESTS*)
 (*let t9a = evaluate (TupC (NumC 1.0 :: BoolC true)) = Tup (Num 1.0, Bool true) *)
 
+(*CAR TESTS*)
+
+(*CDR TESTS*)
 
 
+(*LIST TESTS*)
+
+(*EMPTY TESTS*)
+
+(*HEAD TESTS*)
+
+(*TAIL TESTS*)
+
+(*MAP TESTS*)
+
+(*FOLDR TESTS*)
+
+(*FOLDL TESTS*)
 
 (* LET TESTS *)
 let t11a = evaluate (desugar (LetS ("l", BoolS true, (AndS (VarS "l", BoolS true ) )))) = Bool true
@@ -127,5 +143,15 @@ let t11b = evaluate (desugar  (LetS ("b", NumS 2.0, (ArithS ("+", VarS "b", NumS
 
 (*FUNC TESTS*)
 
-let t12a = evaluate (desugar (CallS (FunS ("f", "x", (NumS 1.0)), NumS 3.0))) = Num 1.0
-let t12b = evaluate (desugar (CallS (FunS ("f", "x", (ArithS ("+", VarS "x", NumS 1.0))), NumS 3.0))) = Num 4.0
+let t12a = evaluate (desugar (CallS (FunS ("f", "x", NumS 1.0), NumS 3.0))) = Num 1.0
+let t12b = evaluate (desugar (CallS (FunS ("f", "x", ArithS ("+", VarS "x", NumS 1.0)), NumS 3.0))) = Num 4.0
+let t12c = evaluate (desugar (CallS (FunS ("f", "x", EqS (BoolS true, VarS "x")), BoolS true))) = Bool true
+let t12d = evaluate (desugar (CallS (FunS ("f", "x", EqS (BoolS true, VarS "x")), BoolS false))) = Bool false
+let t12e = evaluate (desugar (CallS (FunS ("f", "x", VarS "x"), NumS 4.0))) = Num 4.0
+ 
+
+let t12e = evaluate (desugar (CallS (FunS2 ("t", (NumS 1.0)), BoolS true))) = Num 1.0 
+
+(*CLOSURE TESTS*)
+
+(*VALTOSTRING TESTS*)

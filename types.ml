@@ -18,7 +18,7 @@ type exprS = NumS of float
            | LetS of string * exprS * exprS
            | ListS of exprS list
            | GroupS of exprS * (exprS * exprS) list
-           | FunS of string* exprS * exprS
+           | FunS of string * string * exprS
            | FunS2 of string * exprS
            | CallS of exprS * exprS
            | HeadS of exprS 
@@ -38,7 +38,7 @@ type exprC = NumC of float
            | LetC of string * exprC * exprC
            | ListC of exprC list
            | GroupC of exprC * (exprC * exprC) list
-           | FunC of string * exprC * exprC 
+           | FunC of string * string * exprC 
            | FunC2 of string * exprC
            | CallC of exprC * exprC
            | HeadC of exprC 
@@ -46,6 +46,8 @@ type exprC = NumC of float
            | ListElC of exprC * exprC 
            | ListCarC of exprC
            | ListCdrC of exprC
+
+type 'a env = (string * 'a) list
 
 type value = Num of float 
            | Bool of bool 
@@ -180,12 +182,11 @@ let rec desugar exprS = match exprS with
                         | FunS2 (parameter, body) -> FunC2 (parameter, desugar body)
                         | CallS (on_fun, arg) -> CallC (desugar on_fun, desugar arg)
                         | VarS k -> VarC k
-                        | VarS k-> VarC k
-                        | HeadS lst -> HeadC lst
-                        | TailS lst -> TailS lst
-                        | ListElS lst num -> ListElC lst num
-                        | ListCarS lst -> ListCarC lst
-                        | ListCdrS lst -> ListCdrC lst
+                        | HeadS lst -> HeadC (desugar lst)
+                        | TailS lst -> TailC (desugar lst)
+                        | ListElS (lst, n) -> ListElC (desugar lst, desugar n)
+                        | ListCarS lst -> ListCarC (desugar lst)
+                        | ListCdrS lst -> ListCdrC (desugar lst)
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
@@ -214,11 +215,11 @@ let rec interp env r = match r with
                        | VarC k -> (match lookup k env with
                                     | Some v -> v
                                     | None -> raise (Interp "no matching variable found"))
-                       | HeadC lst -> interp env (lst_head lst)
-                       | TailC lst -> interp env (lst_tail lst)
-                       | ListElC lst num -> interp env (lst_num lst num)
-                       | ListCarC lst -> interp env (lst_car lst)
-                       | ListCdrC lst -> interp env (lst_cdr lst)
+                       | HeadC ListC lst -> interp env (lst_head lst)
+                       | TailC ListC lst -> interp env (lst_tail lst)
+                       | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
+                       | ListCarC TupC lst -> interp env (lst_car lst)
+                       | ListCdrC TupC lst -> interp env (lst_cdr lst)
                        | _ -> raise (Interp "interp - Match Not Found")                
 
 
