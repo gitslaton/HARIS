@@ -1,6 +1,14 @@
 exception Desugar of string      (* Used for desugarer errors *)
 exception Interp of string       (* Used for interpreter errors *)
 exception Lists of string        (* Used for list function errors *)
+exception Typecheck of string 
+
+type typeT = NumT 
+           | BoolT 
+           | TupT 
+           | ListT 
+           | ClosureT 
+           | EmptyT
 
 type exprS = NumS of float 
            | BoolS of bool 
@@ -16,7 +24,7 @@ type exprS = NumS of float
            | VarS of string
            | LetS of string * exprS * exprS
            | ListS of exprS list
-           | FunS of string * string * exprS
+           | FunS of string * string * typeT* exprS * typeT
            | FunS2 of string * exprS
            | CallS of exprS * exprS
            | HeadS of exprS 
@@ -37,8 +45,8 @@ type exprC = NumC of float
            | VarC of string
            | LetC of string * exprC * exprC
            | ListC of exprC list
-           | FunC of string * string * exprC 
-           | FunC2 of string * exprC
+           | FunC of string * string * typeT * exprC * typeT
+           | FunC2 of string * typeT * exprC * typeT
            | CallC of exprC * exprC
            | HeadC of exprC 
            | TailC of exprC 
@@ -47,6 +55,15 @@ type exprC = NumC of float
            | ListPrepC of exprC * exprC 
            | TupCarC of exprC
            | TupCdrC of exprC
+
+type 'a env = (string * 'a) list
+
+type value = Num of float 
+           | Bool of bool 
+           | Tup of value list
+           | List of value list 
+           | Closure of value env * exprC
+
 
 
 (* Environment lookup *)
@@ -64,8 +81,10 @@ type value = Num of float
 (* Interpreter steps *)
 val desugar : exprS -> exprC 
 val interp : value env -> exprC -> value 
+val typecheck : exprC -> typeT
 val evaluate : exprC -> value 
 
 
 (* result post-processing *)
 val valToString : value -> string 
+

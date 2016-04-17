@@ -1,6 +1,16 @@
 exception Desugar of string      (* Used for desugarer errors *)
 exception Interp of string       (* Used for interpreter errors *)
 exception Lists of string        (* Used for list function errors *)
+exception Typecheck of string 
+
+
+type typeT = NumT 
+           | BoolT 
+           | TupT 
+           | ListT 
+           | ClosureT 
+           | EmptyT
+           | FunT of typeT * typeT
 
 type exprS = NumS of float 
            | BoolS of bool 
@@ -16,7 +26,7 @@ type exprS = NumS of float
            | VarS of string
            | LetS of string * exprS * exprS
            | ListS of exprS list
-           | FunS of string * string * exprS
+           | FunS of string * string * typeT* exprS * typeT
            | FunS2 of string * exprS
            | CallS of exprS * exprS
            | HeadS of exprS 
@@ -37,8 +47,8 @@ type exprC = NumC of float
            | VarC of string
            | LetC of string * exprC * exprC
            | ListC of exprC list
-           | FunC of string * string * exprC 
-           | FunC2 of string * exprC
+           | FunC of string * string * typeT * exprC * typeT
+           | FunC2 of string * typeT * exprC * typeT
            | CallC of exprC * exprC
            | HeadC of exprC 
            | TailC of exprC 
@@ -55,6 +65,7 @@ type value = Num of float
            | Tup of value list
            | List of value list 
            | Closure of value env * exprC
+
 
 let empty = []
 
@@ -182,8 +193,8 @@ let rec desugar exprS = match exprS with
                         | ListS list_val -> ListC (List.map desugar list_val)
                         | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
                         | TupS list_val -> TupC (List.map desugar list_val)
-                        | FunS (name, parameter, body) -> FunC (name, parameter, desugar body)
-                        | FunS2 (parameter, body) -> FunC2 (parameter, desugar body)
+                        | FunS (name, parameter, paraT, body, bodyT) -> FunC (name, parameter, paraT, desugar body, bodyT)
+                        | FunS2 (parameter, paraT, body, bodyT) -> FunC2 (parameter, paraT, desugar body, bodyT)
                         | CallS (on_fun, arg) -> CallC (desugar on_fun, desugar arg)
                         | VarS k -> VarC k
                         | HeadS lst -> HeadC (desugar lst)
@@ -210,8 +221,8 @@ let rec interp env r = match r with
                        | ListC list_val  -> List (List.map (interp env) list_val)
                        | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
                        | TupC list_val -> Tup (List.map (interp env) list_val)    
-                       | FunC (fun_name, parameter, body) -> Closure (env, r)
-                       | FunC2 (parameter, body) -> Closure (env, r)
+                       | FunC (fun_name, parameter, paraT, body, bodyT) -> Closure (env, r)
+                       | FunC2 (parameter, paraT, body, bodyT) -> Closure (env, r)
                        | CallC (on_fun, arg) -> let c = interp env on_fun in
                                                 let v = interp env arg in 
                                                 (match c with
@@ -237,6 +248,13 @@ let rec interp env r = match r with
 (* evaluate : exprC -> val *)
 let evaluate exprC = exprC |> interp []
 
+(*
+let rec 
+
+let rec typeToString r = 
+  match r with = 
+  | 
+*)
 
 let rec valToString r = 
   let rec list_to_string lst t =
@@ -255,3 +273,69 @@ let rec valToString r =
   | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
   | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
   | _               -> raise (Interp "not valid to express as string")
+
+let rec typecheck_list env lst init =
+  match lst with
+  | [] -> init
+  | hd :: tl -> if (typecheck env hd) = init
+                then typecheck_list env tl init
+                else raise (Typecheck "All values in list must have same type")
+
+  let rec typecheck env ty =
+    match ty with
+    | NumC i -> NumT
+    | BoolC b -> BoolT
+    | IfC (test, option1, option2) -> if typecheck env test = BoolT
+                                      then let t1 =  typecheck env option1 in
+                                              let t2 = typecheck env option2 in
+                                                if t1 = t2
+                                                then t1
+                                                else raise (Typecheck "If statement: then statement does not have some type as else")
+                                      else raise (Typecheck "If statement: test is not a boolean")
+    | ArithC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
+                                             then NumT
+                                             else raise (Typecheck "Cannot do arithmetic on non-Num")
+    | CompC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
+                                            then BoolT
+                                            else raise (Typecheck "Cannot do comparison on non-Num")
+    | EqC (val_l, val_r) -> let (t1, t2) = (typecheck env val_l, typecheck env val_r) in
+                            (match (t1, t2) with
+                            | (NumT, NumT) -> BoolT
+                            | (BoolT, BoolT) -> BoolT
+                            | _ -> raise (Typecheck "Cannot do equality comparison on different types"))
+    (*
+      List needs to have type of element and list
+    *)
+    | ListC list_val -> match list_val with
+                        | [] -> EmptyT
+                        | element :: [] -> typecheck env element 
+                        | element :: rest -> typecheck_list env rest (typecheck env element)
+    | LetC (var, expr1, expr2) -> typecheck (bind var (typecheck env expr1) env) expr2
+    | TupC list_val -> EmptyT
+    | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT env) body in
+                                                        if returnT = bodyT
+                                                        then FunT paraT bodyT
+                                                        else raise (Typecheck "Suggested return type does not match actual body type")
+    | FunC2 (parameter, paraT, body, bodyT) ->  paraT(*
+                                                *)
+    | CallC (on_fun, arg) -> match typecheck env on_fun with
+                            | FunT (t1, t2) -> if t1 = typecheck env arg
+                                               then  t2
+                                               else raise (Typecheck "Argument type does not match function's expected type")
+                            | _ -> raise (Typecheck "Calling non-function")
+    | VarC k -> lookup k env
+    | HeadC lst -> typecheck env lst
+    | TailC lst -> typecheck env lst
+    | ListElC (lst, n) -> match (typecheck env lst, typecheck env n) with
+                          | ( t1, NumT n') -> t1
+                          | _ -> raise (Typecheck "Given non-num for indexing")
+
+    | ListEmC (lst) -> match typecheck env lst with
+                      | t1 -> BoolT
+                      | _ -> raise (Typecheck "Invalid argument") 
+    | ListPrepC (lst, element) -> if typecheck env lst = typecheck env element
+                                  then typecheck env element
+                                  else raise (Typecheck "Cannot prepend onto list of different value type")
+    | TupCarC lst -> typecheck env lst
+    | TupCdrC lst -> typecheck env lst
+    | _ -> raise (Typecheck "typecheck - Match Not Found")                
