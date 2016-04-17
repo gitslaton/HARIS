@@ -57,19 +57,13 @@ rule token = parse
   | "^}"                    { CARROT_R }
   | "$"                     { DOLLAR }
   | "SKIADAS"               { FUN_DECL}
-  | "GROUP"                 { GROUP }
-  | "WITH"                  { WITH } 
-  | ">>"                    { ARROW }
   | "."                     { DOT }
   | "HEAD"                  { HEAD }
   | "TAIL"                  { TAIL }
   | "EMPTY"                 { EMPTY }
+  | "PREPEND"               { PREPEND }
   | "CAR"                   { CAR }
   | "CDR"                   { CDR }
-  | "MAP"                   { MAP }
-  | "FILTER"                { FILTER }
-  | "FOLDR"                 { FOLDR }
-  | "FOLDL"                 { FOLDL }
   | comp as s               { COMPOP s }
   | comm                    { token lexbuf }
   | eof                     { raise Eof }

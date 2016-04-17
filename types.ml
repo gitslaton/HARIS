@@ -2,7 +2,6 @@ exception Desugar of string      (* Used for desugarer errors *)
 exception Interp of string       (* Used for interpreter errors *)
 exception Lists of string        (* Used for list function errors *)
 
-
 type exprS = NumS of float 
            | BoolS of bool 
            | IfS of exprS * exprS * exprS 
@@ -17,16 +16,17 @@ type exprS = NumS of float
            | VarS of string
            | LetS of string * exprS * exprS
            | ListS of exprS list
-           | GroupS of exprS * (exprS * exprS) list
            | FunS of string * string * exprS
            | FunS2 of string * exprS
            | CallS of exprS * exprS
            | HeadS of exprS 
            | TailS of exprS 
-           | ListElS of exprS * exprS 
-           | ListCarS of exprS
-           | ListCdrS of exprS
- 
+           | ListElS of exprS * exprS
+           | ListEmS of exprS
+           | ListPrepS of exprS * exprS
+           | TupCarS of exprS
+           | TupCdrS of exprS
+
 type exprC = NumC of float 
            | BoolC of bool 
            | IfC of exprC * exprC * exprC 
@@ -37,15 +37,16 @@ type exprC = NumC of float
            | VarC of string
            | LetC of string * exprC * exprC
            | ListC of exprC list
-           | GroupC of exprC * (exprC * exprC) list
            | FunC of string * string * exprC 
            | FunC2 of string * exprC
            | CallC of exprC * exprC
            | HeadC of exprC 
            | TailC of exprC 
            | ListElC of exprC * exprC 
-           | ListCarC of exprC
-           | ListCdrC of exprC
+           | ListEmC of exprC
+           | ListPrepC of exprC * exprC 
+           | TupCarC of exprC
+           | TupCdrC of exprC
 
 type 'a env = (string * 'a) list
 
@@ -67,12 +68,12 @@ let rec lookup str env = match env with
 let bind str v env = (str, v) :: env
 
 
-(*LIST THINGS -> PREPEND/EMPTY/TESTING IF NULL/GETTING HEAD/GETTING TAIL*)
+(*LIST THINGS -> PREPEND/EMPTY//GETTING HEAD/GETTING TAIL*)
 (**)
 let prepend lst element = 
     element :: lst
     
-let test_null lst = 
+let test_empty lst = 
     match lst with 
     | [] -> true
     | _ -> false
@@ -95,6 +96,9 @@ let rec lst_num lst num =
                                  then element 
                                  else lst_num rest (num' - 1)
 
+
+(*TUPLE THINGS -> CAR/CDR*)
+(**)
 let lst_car lst = 
     lst_head lst
 
@@ -107,7 +111,7 @@ let lst_cdr lst =
 
 
 (*MAP/FILTER/FOLDR/FOLDL*)
-(**)
+(*
 let rec map fun_x lst = 
     match lst with
     | [] -> []
@@ -129,7 +133,7 @@ let rec foldl fun_a_b x lst =
     match lst with
     | [] -> x
     | element :: rest -> foldl fun_a_b (fun_a_b x element) rest
-(**)
+*)
 
 
 (*HELPER FUNCTIONS*)
@@ -175,7 +179,7 @@ let rec desugar exprS = match exprS with
                         | CompS (str_operator, val_l, val_r) -> CompC (str_operator, desugar val_l, desugar val_r) 
                         | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
                         | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
-                        | ListS list_val      -> ListC (List.map desugar list_val)
+                        | ListS list_val -> ListC (List.map desugar list_val)
                         | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
                         | TupS list_val -> TupC (List.map desugar list_val)
                         | FunS (name, parameter, body) -> FunC (name, parameter, desugar body)
@@ -185,8 +189,10 @@ let rec desugar exprS = match exprS with
                         | HeadS lst -> HeadC (desugar lst)
                         | TailS lst -> TailC (desugar lst)
                         | ListElS (lst, n) -> ListElC (desugar lst, desugar n)
-                        | ListCarS lst -> ListCarC (desugar lst)
-                        | ListCdrS lst -> ListCdrC (desugar lst)
+                        | ListEmS (lst) -> ListEmC (desugar lst)
+                        | ListPrepS (lst, element) -> ListPrepC (desugar lst, desugar element)
+                        | TupCarS lst -> TupCarC (desugar lst)
+                        | TupCdrS lst -> TupCdrC (desugar lst)
                         | _ -> raise (Interp "desugar - Match Not Found")
 
 
@@ -203,7 +209,7 @@ let rec interp env r = match r with
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
                        | ListC list_val  -> List (List.map (interp env) list_val)
                        | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
-                       | TupC list_val -> Tup  (List.map (interp env) list_val)    
+                       | TupC list_val -> Tup (List.map (interp env) list_val)    
                        | FunC (fun_name, parameter, body) -> Closure (env, r)
                        | FunC2 (parameter, body) -> Closure (env, r)
                        | CallC (on_fun, arg) -> let c = interp env on_fun in
@@ -218,8 +224,13 @@ let rec interp env r = match r with
                        | HeadC ListC lst -> interp env (lst_head lst)
                        | TailC ListC lst -> interp env (lst_tail lst)
                        | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
-                       | ListCarC TupC lst -> interp env (lst_car lst)
-                       | ListCdrC TupC lst -> interp env (lst_cdr lst)
+                       | ListEmC (ListC lst) -> interp env (BoolC (test_empty lst))
+                       | ListPrepC (ListC lst, element) -> match element with
+                                                           | NumC element' -> interp env (ListC (prepend lst (NumC element')))
+                                                           | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
+                                                           | _ -> raise (Lists "Prepend: not a single NUM or BOOL")
+                       | TupCarC lst -> interp env (TupC (lst_car (interp env lst)))
+                       | TupCdrC lst -> interp env (TupC (lst_cdr (interp env lst)))
                        | _ -> raise (Interp "interp - Match Not Found")                
 
 
@@ -239,7 +250,7 @@ let rec valToString r =
                 | hd :: [] -> valToString hd
                 | hd :: tl -> (valToString hd ^ ", " ^ list_to_string tl "tup")) in 
   match r with
-  | Num i           -> string_of_float i
+  | Num i           -> string_of_float i ^ "0"
   | Bool b 			    -> string_of_bool b
   | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
   | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 

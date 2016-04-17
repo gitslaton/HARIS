@@ -6,9 +6,7 @@
 %token <string> VAR 
 %token <float> FLOAT 
 %token <string> COMPOP
-%token ARROW 
 %token FUN_DECL 
-%token GROUP WITH 
 %token TRUE FALSE 
 %token DBLSEMI 
 %token IF THEN ELSE 
@@ -23,23 +21,29 @@
 %token PAREN_L PAREN_R 
 %token BRACK_L BRACK_R 
 %token DOT
-%token HEAD TAIL CAR CDR EMPTY FOLDR FOLDL MAP FILTER
-%nonassoc LET 
-%nonassoc IN 
+%token HEAD TAIL PREPEND EMPTY
+%token CAR CDR
+%nonassoc LET
+%nonassoc IN
+%left OR OR2 AND AND2
+%left EQ NEQ NOT
+%left IF THEN ELSE
+%right HEAD TAIL PREPEND EMPTY
+%right CAR CDR
+%nonassoc DOT
+%nonassoc COMPOP
+%left PLUS MINUS
+%left TIMES DIVIDE
 %nonassoc FLOAT
-%nonassoc ELSE 
-%left OR OR2 AND AND2 
-%nonassoc EQ NEQ 
-%nonassoc NOT 
-%nonassoc COMPOP  
-%left PLUS MINUS 
-%left TIMES DIVIDE 
 
 
 
 %start main
 %type <Types.exprS> main
 %%
+
+
+
 
 main:
   | headEx DBLSEMI                    { $1 }
@@ -72,19 +76,21 @@ expr:
   | expr DIVIDE expr                                                                     { ArithS ("/", $1, $3) } 
   | expr COMPOP expr                                                                     { CompS ($2, $1, $3) } 
   | expr EQ expr                                                                         { EqS ($1, $3) }
-  | expr NEQ expr 	                                                                    { NeqS ($1, $3) }
+  | expr NEQ expr 	                                                                     { NeqS ($1, $3) }
   | CURLY_L CURLY_R                                                                      { TupS [] } 
   | CURLY_L expr_lst CURLY_R                                                             { TupS $2 }
   | CARROT_L CARROT_R                                                                    { ListS [] }
   | CARROT_L expr_lst CARROT_R                                                           { ListS ($2) }
   | VAR                                                                                  { VarS $1 }
   | LET VAR EQUAL expr IN expr                                                           { LetS ($2, $4, $6) }
-  | BRACK_L FUN_DECL VAR BRACK_L VAR BRACK_R EQUAL BRACK_L expr BRACK_R BRACK_R         { FunS ($3, $5, $9) }
+  | BRACK_L FUN_DECL VAR BRACK_L VAR BRACK_R EQUAL BRACK_L expr BRACK_R BRACK_R          { FunS ($3, $5, $9) }
   | BRACK_L FUN_DECL VAR EQUAL BRACK_L expr BRACK_R BRACK_R                              { FunS2 ($3, $6) }
   | expr DOT HEAD                                                                        { HeadS ($1) } 
   | expr DOT TAIL                                                                        { TailS ($1) } 
-  | expr DOT FLOAT                                                                       { ListElS ($1, NumS $3) } 
-  | expr DOT CAR                                                                         { ListCarS ($1) } 
-  | expr DOT CDR                                                                         { ListCdrS ($1) } 
+  | expr DOT FLOAT                                                                       { ListElS ($1, NumS $3) }
+  | expr DOT EMPTY                                                                       { ListEmS ($1) }
+  | expr DOT PREPEND DOT expr                                                            { ListPrepS ($1, $5)}
+  | expr DOT CAR                                                                         { TupCarS ($1) } 
+  | expr DOT CDR                                                                         { TupCdrS ($1) } 
 ;
 

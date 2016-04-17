@@ -1,6 +1,6 @@
-exception Desugar of string      (* Use for desugarer errors *)
-exception Interp of string       (* Use for interpreter errors *)
-
+exception Desugar of string      (* Used for desugarer errors *)
+exception Interp of string       (* Used for interpreter errors *)
+exception Lists of string        (* Used for list function errors *)
 
 type exprS = NumS of float 
            | BoolS of bool 
@@ -16,16 +16,17 @@ type exprS = NumS of float
            | VarS of string
            | LetS of string * exprS * exprS
            | ListS of exprS list
-           | GroupS of exprS * (exprS * exprS) list
            | FunS of string * string * exprS
            | FunS2 of string * exprS
            | CallS of exprS * exprS
            | HeadS of exprS 
            | TailS of exprS 
            | ListElS of exprS * exprS
-           | ListCarS of exprS
-           | ListCdrS of exprS
- 
+           | ListEmS of exprS
+           | ListPrepS of exprS * exprS
+           | TupCarS of exprS
+           | TupCdrS of exprS
+
 type exprC = NumC of float 
            | BoolC of bool 
            | IfC of exprC * exprC * exprC 
@@ -36,15 +37,16 @@ type exprC = NumC of float
            | VarC of string
            | LetC of string * exprC * exprC
            | ListC of exprC list
-           | GroupC of exprC * (exprC * exprC) list
            | FunC of string * string * exprC 
            | FunC2 of string * exprC
            | CallC of exprC * exprC
            | HeadC of exprC 
            | TailC of exprC 
            | ListElC of exprC * exprC 
-           | ListCarC of exprC
-           | ListCdrC of exprC
+           | ListEmC of exprC
+           | ListPrepC of exprC * exprC 
+           | TupCarC of exprC
+           | TupCdrC of exprC
 
 
 (* Environment lookup *)

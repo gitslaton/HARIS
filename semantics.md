@@ -45,31 +45,24 @@ Lists are contained by the curly braces, `{ }`, and the carrot symbol, `^`, comb
 ```
 
 ####List Functions####
-HARIS has eight built-in list functions to help work with and change lists.
-* map
- * Parameters: function that takes one input; list
- * Return: new list containing all the elements from the inputed list with the inputed function applied
-* filter
- * Parameters: function that takes one input and returns a boolean; list
- * Return: new list containing all the elements from the inputed list that returned true when applied to the inputed function
-* foldr
- * Parameters: function that takes two inputs input; list; element
- * Return: list that accumulates using the inputed function starting from the right (or end) of the inputed list and using the element 
-* foldl
- * Parameters: function that takes two input; element; list
- * Return: list that accumulates using the inputed function starting from the left (or beginning) of the inputed list and using the element 
-* prepend
- * Parameters: list; element to prepend to list
- * Return: list with element prepended to the front of the list
-* test_null
+HARIS has four built-in list functions to help work with and change lists. To access these functions, simply have a list, put `.` and the name of the function you're wanting to use after it.
+* `EMPTY`
  * Parameters: list
- * Return: true if the list is empty/null; else false
-* lst_head
- * Parameters: list
- * Return: first element (or head) of the list
-* lst_tail
- * Parameters: list
- * Return: last element (or tail) of the list
+ * Returns true if the list is empty or null and false if the opposite
+* `HEAD
+ * Returns the first element (or head) of the list
+* `TAIL`
+ * Returns the last element (or tail) of the list
+* `PREPEND`
+ * Returns the list with an element prepended to the front of the list
+
+Prepend is a bit different. The following is an example of the proper syntax:
+
+```
+{^1 $ 2 $ 3^}.PREPEND.element
+```
+`element` is the element you wish to prepend to the beginning of the list.
+
 
 ### Functions ###
 Functions in HARIS are declared in the following manner:

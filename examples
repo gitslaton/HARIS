@@ -1,8 +1,12 @@
-GROUP CODE
-(PARSER)
-expr_group:
-  | DOLLAR PAREN_L expr PAREN_R ARROW PAREN_L expr PAREN_R               { [($3, $7)] }
-  | DOLLAR PAREN_L expr PAREN_R ARROW PAREN_L expr PAREN_R expr_group    { ($3, $7) :: $9 }
-;
-
-  | GROUP PAREN_L expr PAREN_R WITH expr_group      { GroupS ($3, $6) }
+(*
+%nonassoc LET 
+%nonassoc IN 
+%nonassoc FLOAT
+%nonassoc ELSE 
+%left OR OR2 AND AND2 
+%nonassoc EQ NEQ 
+%nonassoc NOT 
+%nonassoc COMPOP  
+%left PLUS MINUS 
+%left TIMES DIVIDE 
+*)
