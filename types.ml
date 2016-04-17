@@ -106,7 +106,7 @@ let lst_cdr lst =
     match lst with
     | [] -> raise (Lists "list is empty")
     | element :: [] -> raise (Lists "list does not have enough elements")
-    | element :: element' :: rest -> element'
+    | element :: rest -> rest
 (**)
 
 
@@ -213,11 +213,11 @@ let rec interp env r = match r with
                        | FunC (fun_name, parameter, body) -> Closure (env, r)
                        | FunC2 (parameter, body) -> Closure (env, r)
                        | CallC (on_fun, arg) -> let c = interp env on_fun in
-                                              let v = interp env arg in 
-                                              (match c with
-                                              | Closure (env', FunC (name, para, body)) -> interp (bind name c (bind para v env')) body
-                                              | Closure (env', FunC2 (para, body)) -> interp (bind para v env') body
-                                              | _ -> raise (Interp "Cannot run on non-closure"))
+                                                let v = interp env arg in 
+                                                (match c with
+                                                 | Closure (env', FunC (name, para, body)) -> interp (bind name c (bind para v env')) body
+                                                 | Closure (env', FunC2 (para, body)) -> interp (bind para v env') body
+                                                 | _ -> raise (Interp "Cannot run on non-closure"))
                        | VarC k -> (match lookup k env with
                                     | Some v -> v
                                     | None -> raise (Interp "no matching variable found"))
@@ -225,12 +225,12 @@ let rec interp env r = match r with
                        | TailC ListC lst -> interp env (lst_tail lst)
                        | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
                        | ListEmC (ListC lst) -> interp env (BoolC (test_empty lst))
-                       | ListPrepC (ListC lst, element) -> match element with
+                       | ListPrepC (ListC lst, element) -> (match element with
                                                            | NumC element' -> interp env (ListC (prepend lst (NumC element')))
                                                            | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
-                                                           | _ -> raise (Lists "Prepend: not a single NUM or BOOL")
-                       | TupCarC lst -> interp env (TupC (lst_car (interp env lst)))
-                       | TupCdrC lst -> interp env (TupC (lst_cdr (interp env lst)))
+                                                           | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
+                       | TupCarC TupC lst -> interp env (lst_head lst)
+                       | TupCdrC TupC lst -> interp env (TupC (lst_cdr lst))
                        | _ -> raise (Interp "interp - Match Not Found")                
 
 

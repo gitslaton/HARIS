@@ -11,8 +11,8 @@ let frac = '.' digit+
 let exp = ['e' 'E'] sign? digit+
 let white = [' ' '\t' '\n' '\r']+ | "//" ([^ '\n' '\r'])*
 let newline = '\n' | '\r' | "\r\n"
-let alpha_num = ['a'-'z' 'A'-'Z' '_']* ['0'-'9']*
-let comm = "+-" any* "-+" 
+let alpha_num = ['a'-'z' 'A'-'Z' '_']+ ['a'-'z' 'A'-'Z' '_' '0'-'9']*
+let comm = "+-" ['a'-'z' 'A'-'Z' '_' ''' '[' ']' '^' '!' '@' '$' '%' '&' '*' '(' ')' '{' '}' ';' '"' '.' '?' '>' '<' '+' ',' '/' '-' '+' ' ' '\t' '\n' '\r']*   "-+" 
 let dblsemi = ";;"
 let float = (digit+ '.'? | digit* frac) exp?
 let true = "true" | "#t" 
@@ -65,8 +65,9 @@ rule token = parse
   | "CAR"                   { CAR }
   | "CDR"                   { CDR }
   | comp as s               { COMPOP s }
-  | comm                    { token lexbuf }
+  | comm               { token lexbuf }
   | eof                     { raise Eof }
   | alpha_num as a          { VAR a }
   | any                     { raise Unrecognized }
 
+ 
