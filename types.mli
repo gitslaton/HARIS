@@ -5,10 +5,11 @@ exception Typecheck of string
 
 type typeT = NumT 
            | BoolT 
-           | TupT 
-           | ListT 
+           | TupT of typeT list
+           | ListT of typeT
            | ClosureT 
-           | EmptyT
+           | AnyT
+           | FunT of typeT * typeT
 
 type exprS = NumS of float 
            | BoolS of bool 
@@ -24,8 +25,8 @@ type exprS = NumS of float
            | VarS of string
            | LetS of string * exprS * exprS
            | ListS of exprS list
-           | FunS of string * string * typeT* exprS * typeT
-           | FunS2 of string * exprS
+           | FunS of string * string * typeT * exprS * typeT
+           | FunS2 of string * typeT * exprS * typeT
            | CallS of exprS * exprS
            | HeadS of exprS 
            | TailS of exprS 
@@ -56,15 +57,6 @@ type exprC = NumC of float
            | TupCarC of exprC
            | TupCdrC of exprC
 
-type 'a env = (string * 'a) list
-
-type value = Num of float 
-           | Bool of bool 
-           | Tup of value list
-           | List of value list 
-           | Closure of value env * exprC
-
-
 
 (* Environment lookup *)
 type 'a env
@@ -81,7 +73,7 @@ type value = Num of float
 (* Interpreter steps *)
 val desugar : exprS -> exprC 
 val interp : value env -> exprC -> value 
-val typecheck : exprC -> typeT
+val typecheck : typeT env -> exprC -> typeT
 val evaluate : exprC -> value 
 
 

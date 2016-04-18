@@ -27,6 +27,8 @@ rule token = parse
   | newline                 { token lexbuf }
   | dblsemi                 { DBLSEMI }
   | float as x              { FLOAT (float_of_string x) }
+  | "FLOAT"                 { FLOAT_T}
+  | "BOOL"                  { BOOL_T }
   | true 		                { TRUE } 
   | false 		              { FALSE }
   | "LET"                   { LET }
@@ -39,6 +41,7 @@ rule token = parse
   | "AND"                   { AND }
   | "&&"                    { AND2 }
   | "NOT"                   { NOT }
+  | ":"                     { COLON }
   | "+"                     { PLUS }
   | "-"                     { MINUS }
   | "*"                     { TIMES }
@@ -65,7 +68,7 @@ rule token = parse
   | "CAR"                   { CAR }
   | "CDR"                   { CDR }
   | comp as s               { COMPOP s }
-  | comm               { token lexbuf }
+  | comm                    { token lexbuf }
   | eof                     { raise Eof }
   | alpha_num as a          { VAR a }
   | any                     { raise Unrecognized }
