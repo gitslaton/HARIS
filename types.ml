@@ -294,11 +294,11 @@ let rec typecheck env ty =
   | GLetC (var, expr1) -> let t = typecheck env expr1 in
                               (global_static_env := bind var t env; t)
   | TupC list_val -> TupT (List.fold_right (fun x acc -> (typecheck env x :: acc)) list_val [])
-  | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT env) body in
+  | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT (bind parameter paraT env)) body in
                                                       if returnT = bodyT
                                                       then FunT (paraT, bodyT)
                                                       else raise (Typecheck "Suggested return type does not match actual body type")
-  | FunC2 (parameter, paraT, body, bodyT) -> if typecheck env body = bodyT
+  | FunC2 (parameter, paraT, body, bodyT) -> if typecheck (bind parameter paraT env) body = bodyT
                                              then FunT (paraT, bodyT)
                                              else raise (Typecheck "Suggested return type does not match actual body type")
   | CallC (on_fun, arg) -> (match typecheck env on_fun with
@@ -308,7 +308,7 @@ let rec typecheck env ty =
                            | _ -> raise (Typecheck "Calling non-function"))
   | VarC k -> (match lookup k env with
                | Some v -> v
-               | None -> raise (Interp "no matching variable found"))
+               | None -> raise (Typecheck "no matching variable found"))
   | HeadC lst -> (match typecheck env lst with
                   | ListT t -> t
                   | _ -> raise (Typecheck "Cannot call HEAD on non-list"))

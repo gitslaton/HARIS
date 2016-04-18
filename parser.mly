@@ -9,7 +9,7 @@
 %token FUN_DECL 
 %token TRUE FALSE 
 %token DBLSEMI 
-%token IF THEN ELSE 
+%token IF THEN ELSE USE
 %token LET
 %token EQUAL
 %token IN
@@ -28,7 +28,7 @@
 %nonassoc IN
 %left OR OR2 AND AND2
 %left EQ NEQ NOT
-%left IF THEN ELSE
+%left IF THEN ELSE USE
 %right HEAD TAIL PREPEND EMPTY
 %right CAR CDR
 %nonassoc DOT
@@ -67,6 +67,7 @@ expr_T:
 ;
 
 expr:
+  | VAR                                                                                  { VarS $1 }
   | FLOAT                                                                                { NumS $1 }
   | TRUE                                                                                 { BoolS true }
   | FALSE                                                                                { BoolS false }
@@ -87,16 +88,16 @@ expr:
   | CURLY_L expr_lst CURLY_R                                                             { TupS $2 }
   | CARROT_L CARROT_R                                                                    { ListS [] }
   | CARROT_L expr_lst CARROT_R                                                           { ListS ($2) }
-  | VAR                                                                                  { VarS $1 }
-  | LET VAR EQUAL expr IN expr                                                           { LetS ($2, $4, $6) }
-  | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { FunS ($3, $5, $7, $11, $13) }
+  | LET VAR EQUAL expr IN expr                                                                               { LetS ($2, $4, $6) }
+  | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { GLetS ($3, FunS ($3, $5, $7, $11, $13)) }
   | BRACK_L FUN_DECL BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R        { FunS2 ($4, $6, $10, $12) }
-  | expr DOT HEAD                                                                        { HeadS ($1) } 
-  | expr DOT TAIL                                                                        { TailS ($1) } 
-  | expr DOT FLOAT                                                                       { ListElS ($1, NumS $3) }
-  | expr DOT EMPTY                                                                       { ListEmS ($1) }
-  | expr DOT PREPEND DOT expr                                                            { ListPrepS ($1, $5)}
-  | expr DOT CAR                                                                         { TupCarS ($1) } 
-  | expr DOT CDR                                                                         { TupCdrS ($1) } 
+  | USE expr expr                                                                                            {CallS ($2, $3)}
+  | expr DOT HEAD                                                                                            { HeadS ($1) } 
+  | expr DOT TAIL                                                                                            { TailS ($1) } 
+  | expr DOT FLOAT                                                                                           { ListElS ($1, NumS $3) }
+  | expr DOT EMPTY                                                                                           { ListEmS ($1) }
+  | expr DOT PREPEND DOT expr                                                                                { ListPrepS ($1, $5)}
+  | expr DOT CAR                                                                                             { TupCarS ($1) } 
+  | expr DOT CDR                                                                                             { TupCdrS ($1) } 
 ;
 

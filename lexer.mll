@@ -67,6 +67,7 @@ rule token = parse
   | "PREPEND"               { PREPEND }
   | "CAR"                   { CAR }
   | "CDR"                   { CDR }
+  | "USE"                   { USE }
   | comp as s               { COMPOP s }
   | comm                    { token lexbuf }
   | eof                     { raise Eof }
