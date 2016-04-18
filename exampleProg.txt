@@ -1,13 +1,13 @@
 +- This is a simple example program in HARIS -+ 
 LET x = 8 IN 
-[SKIADAS addTimes [x] = 
-[ x + 2 * 5 ] ] +- Should return 18 -+
+[SKIADAS addTimes [x : NUM] = 
+[ x + 2 * 5 : NUM ] ] +- Should return 18 -+
 
 LET lst = {^ 1 $ 2 $ 3 ^} IN map [ 
-[SKIADAS fun [el] [ el * 10 ] ] lst ] +- lst will be {^ 10 & 20 $ 30 ^} -+
+[SKIADAS fun [el : NUM LIST] [ el * 10 ] ] lst  : NUM LIST] +- lst will be {^ 10 & 20 $ 30 ^} -+
 
-[SKIADAS func [num] = 
-[ IF num > 10 THEN num ELSE num - 100 ] ]
+[SKIADAS func [num : NUM] = 
+[ IF num > 10 THEN num ELSE num - 100 : NUM ] ]
 
 func [15] +- Should return 15 -+
 func [2] +- Should return -98 -+
