@@ -1,28 +1,5 @@
 open Types
 
-(*
-2 + 2;;
-2 - 2;;
-2 * 2;;
-2 / 2;;
-
-IF true THEN 5 ELSE 10;;
-IF false THEN 5 ELSE 10;;
-
-LET test = 5 IN test + test;;
-LET tEst = 5 + 5 IN test - 5;;
-
-[SKIADAS test_fun [x, y] =
-	[x + y]
-]
-
-test_fun [5, 10];;
-test_fun [10, 10];;
-
-*)
-
-
-
 (* You can test expressions of type resultS or resultC and how they are evaluated *)
 (* These will only work once you have compiled types.ml *)
 
@@ -64,7 +41,7 @@ let t4a = evaluate (desugar (OrS (BoolS true, BoolS true))) = Bool true
 let t4b = evaluate (desugar (OrS (BoolS false, BoolS true))) = Bool true 
 let t4c = evaluate (desugar (OrS (BoolS true, BoolS false))) = Bool true 
 let t4d = evaluate (desugar (OrS (BoolS false, BoolS false))) = Bool false 
-
+https://github.com/gitslaton/HARIS.git
 let t5a = evaluate (desugar (AndS (BoolS true, BoolS true))) = Bool true 
 let t5b = evaluate (desugar (AndS (BoolS true, BoolS false))) = Bool false 
 let t5c = evaluate (desugar (AndS (BoolS false, BoolS true))) = Bool false 
@@ -116,26 +93,33 @@ let t8i = evaluate (desugar (NeqS (NumS 5.0, NumS 5.0))) = Bool false
 let t8j = evaluate (desugar (NeqS (NumS 5.0, NumS 4.0))) = Bool true
 
 (*TUP TESTS*)
-(*let t9a = evaluate (TupC (NumC 1.0 :: BoolC true)) = Tup (Num 1.0, Bool true) *)
+let t9a = evaluate (TupC (NumC 1.0 :: NumC 8.0)) = Tup (Num 1.0, Num 8.0) 
+let t9b = evaluate (TupC (NumC 6.0 :: NumC 4.0 :: NumC 7.0)) = Tup (Num 6.0, Num 4.0, Num 7.0)
+let t9c = evaluate (TupC (BoolC false :: BoolC true :: BoolC true :: BoolC false)) = Tup (Bool false, Bool true, Bool true, Bool false)
 
 (*CAR TESTS*)
-
+let t10a = evaluate (TupCarC (TupC (NumC 1.0 :: NumC 8.0))) = Num 1.0
+let t10b = evaluate (TupCarC ((TupC (BoolC false :: BoolC true :: BoolC true :: BoolC false)))) = Bool false
 (*CDR TESTS*)
 
+let t15a = evaluate (TupCdrC (TupC (NumC 1.0 :: NumC 8.0))) = Num 8.0
+let t15b = evaluate (TupCdrC ((TupC (BoolC false :: BoolC true :: BoolC true :: BoolC false)))) = (Bool true :: Bool true :: Bool false))
 
 (*LIST TESTS*)
+let t14a = evaluate (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0)) = List {^ Num 1.0 $ Num 2.0 $ Num 3.0 ^}
+let t14b = evaluate (ListC (BoolC true :: BoolC false)) = List {^ Bool true $ Bool false ^}
 
 (*EMPTY TESTS*)
+let t16a = evaluate (test_empty (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0))) = Bool false
+let t16b = evaluate (test_empty (ListC ())) = Bool true
 
 (*HEAD TESTS*)
+let t17a = evaluate (lst_head (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0))) = Num 1.0
+let t17b = evaluate (lst_head (ListC (BoolC true))) = Bool true
 
 (*TAIL TESTS*)
-
-(*MAP TESTS*)
-
-(*FOLDR TESTS*)
-
-(*FOLDL TESTS*)
+let t18a = evaluate (lst_tail (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0))) = Num 3.0
+let t18b = evaluate (lst_tail (ListC (BoolC true))) = Bool true
 
 (* LET TESTS *)
 let t11a = evaluate (desugar (LetS ("l", BoolS true, (AndS (VarS "l", BoolS true ) )))) = Bool true
@@ -148,10 +132,5 @@ let t12b = evaluate (desugar (CallS (FunS ("f", "x", ArithS ("+", VarS "x", NumS
 let t12c = evaluate (desugar (CallS (FunS ("f", "x", EqS (BoolS true, VarS "x")), BoolS true))) = Bool true
 let t12d = evaluate (desugar (CallS (FunS ("f", "x", EqS (BoolS true, VarS "x")), BoolS false))) = Bool false
 let t12e = evaluate (desugar (CallS (FunS ("f", "x", VarS "x"), NumS 4.0))) = Num 4.0
- 
+let t12f = evaluate (desugar (CallS (FunS2 ("t", (NumS 1.0)), BoolS true))) = Num 1.0 
 
-let t12e = evaluate (desugar (CallS (FunS2 ("t", (NumS 1.0)), BoolS true))) = Num 1.0 
-
-(*CLOSURE TESTS*)
-
-(*VALTOSTRING TESTS*)
