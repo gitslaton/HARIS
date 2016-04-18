@@ -87,6 +87,7 @@ expr:
   | CARROT_L CARROT_R                                                                    { ListS [] }
   | CARROT_L expr_lst CARROT_R                                                           { ListS ($2) }
   | VAR                                                                                  { VarS $1 }
+  | LET VAR EQUAL expr                                                                   { GLetS ($2, $4) }
   | LET VAR EQUAL expr IN expr                                                           { LetS ($2, $4, $6) }
   | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { FunS ($3, $5, $7, $11, $13) }
   | BRACK_L FUN_DECL VAR COLON expr_T EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R                              { FunS2 ($3, $5, $8, $10) }

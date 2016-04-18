@@ -24,6 +24,7 @@ type exprS = NumS of float
            | NeqS of exprS * exprS 
            | TupS of exprS list 
            | VarS of string
+           | GLetS of string * exprS * exprS
            | LetS of string * exprS * exprS
            | ListS of exprS list
            | FunS of string * string * typeT * exprS * typeT
@@ -45,6 +46,7 @@ type exprC = NumC of float
            | EqC of exprC * exprC 
            | TupC of exprC list
            | VarC of string
+           | GLetC of string * exprC * exprC
            | LetC of string * exprC * exprC
            | ListC of exprC list
            | FunC of string * string * typeT * exprC * typeT
@@ -192,6 +194,7 @@ let rec desugar exprS = match exprS with
                         | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
                         | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
                         | ListS list_val -> ListC (List.map desugar list_val)
+                        | GLetS (var, expr1, expr2) -> GLetC (var, desugar expr1, desugar expr2)
                         | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
                         | TupS list_val -> TupC (List.map desugar list_val)
                         | FunS (name, parameter, paraT, body, bodyT) -> FunC (name, parameter, paraT, desugar body, bodyT)
@@ -220,6 +223,7 @@ let rec interp env r = match r with
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
                        | ListC list_val  -> List (List.map (interp env) list_val)
+                       | GLetC (var, expr1, expr2) -> interp (bind var (interp env expr1) global_env) expr2
                        | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
                        | TupC list_val -> Tup (List.map (interp env) list_val)    
                        | FunC (fun_name, parameter, paraT, body, bodyT) -> Closure (env, r)
@@ -230,9 +234,11 @@ let rec interp env r = match r with
                                                  | Closure (env', FunC (name, para, paraT, body, bodyT)) -> interp (bind name c (bind para v env')) body
                                                  | Closure (env', FunC2 (para, paraT, body, bodyT)) -> interp (bind para v env') body
                                                  | _ -> raise (Interp "Cannot run on non-closure"))
-                       | VarC k -> (match lookup k env with
+                       | VarC k -> (match lookup k global_env with
                                     | Some v -> v
-                                    | None -> raise (Interp "no matching variable found"))
+                                    | None -> match lookup k env with
+                                              | Some v -> v
+                                              | None -> raise (Interp "No matching variable found"))
                        | HeadC ListC lst -> interp env (lst_head lst)
                        | TailC ListC lst -> interp env (lst_tail lst)
                        | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')

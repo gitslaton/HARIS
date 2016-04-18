@@ -7,7 +7,7 @@ let _ =
       flush stdout;
       try
         let result = Parser.main Lexer.token lexbuf in
-          result |> desugar |> evaluate
+          result |> desugar |> evaluate 
                  |> valToString |> output_string stdout;
           print_newline();
       with

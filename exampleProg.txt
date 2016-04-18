@@ -12,3 +12,21 @@ LET lst = {^ 1 $ 2 $ 3 ^} IN map [
 func [15] +- Should return 15 -+
 func [2] +- Should return -98 -+
 
++-MAP-+
+[SKIADAS map [fun_x : FunT ] = 
+	LET acc = [] IN 
+	[SKIADAS f [lst: ListT] = 
+		IF lst.EMPTY
+		THEN acc
+		ELSE acc.PREPEND.(fun_x lst.HEAD)
+	]]
+
++-FILTER-+
+[SKIADAS
+ 
+
+
++-FOLDR-+
+
+
++-FOLDL-+
