@@ -76,9 +76,9 @@ type value = Num of float
 val desugar : exprS -> exprC 
 val interp : value env -> exprC -> value 
 val typecheck : typeT env -> exprC -> typeT
-val evaluate : exprC -> value 
+val evaluate : exprC -> typeT * value 
 
 
 (* result post-processing *)
-val valToString : value -> string 
+val typeToCombo : typeT * value -> string
 

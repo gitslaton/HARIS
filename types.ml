@@ -70,7 +70,9 @@ type value = Num of float
 
 let empty = [] 
 
-let global_env = [] 
+let global_env = ref [] 
+
+let global_static_env = ref [] 
 
 
 (* lookup : string -> 'a env -> 'a option *)
@@ -223,7 +225,8 @@ let rec interp env r = match r with
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
                        | ListC list_val  -> List (List.map (interp env) list_val)
-                       | GLetC (var, expr1) -> interp (bind var (interp env expr1) global_env) expr1
+                       | GLetC (var, expr1) -> let x = interp env expr1 in
+                                                  (global_env := bind var x env; x)
                        | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
                        | TupC list_val -> Tup (List.map (interp env) list_val)    
                        | FunC (fun_name, parameter, paraT, body, bodyT) -> Closure (env, r)
@@ -234,11 +237,9 @@ let rec interp env r = match r with
                                                  | Closure (env', FunC (name, para, paraT, body, bodyT)) -> interp (bind name c (bind para v env')) body
                                                  | Closure (env', FunC2 (para, paraT, body, bodyT)) -> interp (bind para v env') body
                                                  | _ -> raise (Interp "Cannot run on non-closure"))
-                       | VarC k -> (match lookup k global_env with
+                       | VarC k -> (match lookup k env with 
                                     | Some v -> v
-                                    | None -> match lookup k env with
-                                              | Some v -> v
-                                              | None -> raise (Interp "No matching variable found"))
+                                    | None -> raise (Interp "No matching variable found"))
                        | HeadC ListC lst -> interp env (lst_head lst)
                        | TailC ListC lst -> interp env (lst_tail lst)
                        | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
@@ -269,7 +270,7 @@ let rec typecheck env ty =
                                             let t2 = typecheck env option2 in
                                               if t1 = t2
                                               then t1
-                                              else raise (Typecheck "If statement: then statement does not have some type as else")
+                                              else raise (Typecheck "If statement: then statement does not have same type as else")
                                     else raise (Typecheck "If statement: test is not a boolean")
   | ArithC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
                                            then NumT
@@ -290,6 +291,8 @@ let rec typecheck env ty =
                       | element :: [] -> ListT (typecheck env element)
                       | element :: rest -> ListT (typecheck_list env rest (typecheck env element)))
   | LetC (var, expr1, expr2) -> typecheck (bind var (typecheck env expr1) env) expr2
+  | GLetC (var, expr1) -> let t = typecheck env expr1 in
+                              (global_static_env := bind var t env; t)
   | TupC list_val -> TupT (List.fold_right (fun x acc -> (typecheck env x :: acc)) list_val [])
   | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT env) body in
                                                       if returnT = bodyT
@@ -332,7 +335,8 @@ let rec typecheck env ty =
 
 
 (* evaluate : exprC -> val *)
-let evaluate exprC = exprC |> interp []
+let evaluate exprC = let t = typecheck (!global_static_env) exprC in
+                        (t, interp (!global_env) exprC)
 
 
 
@@ -363,5 +367,5 @@ let rec typeToString r =
   | FunT (para, body) -> typeToString para ^ typeToString body
   | _ -> "TYPE UNKNOWN") 
 
-let typeToCombo v vT = 
-  valToString v ^ ": " ^ typeToString vT
+let typeToCombo (vT, v) = 
+  typeToString vT ^ " : " ^ valToString v 

@@ -1,10 +1,7 @@
 open Types
 
-(* You can test expressions of type resultS or resultC and how they are evaluated *)
-(* These will only work once you have compiled types.ml *)
-
 (* This is the one kind of test you can write. *)
-let t0a = evaluate (NumC 2.3) = Num 2.3
+let t0a = evaluate (NumC 2.3) = (NumT, Num 2.3)
 
 (* You can also use interp directly to specify a custom environment. *)
 let t0b = let env1 = bind "x" (Num 3.1) empty
@@ -102,11 +99,11 @@ let t10b = evaluate (TupCarC ((TupC (BoolC false :: BoolC true :: BoolC true :: 
 (*CDR TESTS*)
 
 let t15a = evaluate (TupCdrC (TupC (NumC 1.0 :: NumC 8.0))) = Num 8.0
-let t15b = evaluate (TupCdrC ((TupC (BoolC false :: BoolC true :: BoolC true :: BoolC false)))) = (Bool true :: Bool true :: Bool false))
+let t15b = evaluate (TupCdrC ((TupC (BoolC false :: BoolC true :: BoolC true :: BoolC false)))) = (Bool true :: Bool true :: Bool false)
 
 (*LIST TESTS*)
-let t14a = evaluate (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0)) = List {^ Num 1.0 $ Num 2.0 $ Num 3.0 ^}
-let t14b = evaluate (ListC (BoolC true :: BoolC false)) = List {^ Bool true $ Bool false ^}
+let t14a = evaluate (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0)) = List (Num 1.0, Num 2.0, Num 3.0)
+let t14b = evaluate (ListC (BoolC true :: BoolC false)) = List (Bool true, Bool false)
 
 (*EMPTY TESTS*)
 let t16a = evaluate (test_empty (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0))) = Bool false

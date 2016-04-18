@@ -8,7 +8,7 @@ let _ =
       try
         let result = Parser.main Lexer.token lexbuf in
           result |> desugar |> evaluate 
-                 |> valToString |> output_string stdout;
+                 |> typeToCombo |> output_string stdout;
           print_newline();
       with
         | Parsing.Parse_error       -> output_string stdout "Parse error in statement";
@@ -24,6 +24,12 @@ let _ =
                                        print_newline();
                                        Lexing.flush_input lexbuf
         | Interp s                  -> output_string stdout ("Interpret error: " ^ s);
+                                       print_newline();
+                                       Lexing.flush_input lexbuf
+        | Lists s                   -> output_string stdout ("List error: " ^ s);
+                                       print_newline();
+                                       Lexing.flush_input lexbuf
+        | Typecheck s               -> output_string stdout ("Typecheck error: " ^ s);
                                        print_newline();
                                        Lexing.flush_input lexbuf
     done

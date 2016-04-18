@@ -27,7 +27,7 @@ rule token = parse
   | newline                 { token lexbuf }
   | dblsemi                 { DBLSEMI }
   | float as x              { FLOAT (float_of_string x) }
-  | "FLOAT"                 { FLOAT_T}
+  | "NUM"                   { NUM_T}
   | "BOOL"                  { BOOL_T }
   | true 		                { TRUE } 
   | false 		              { FALSE }

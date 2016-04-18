@@ -23,7 +23,7 @@
 %token DOT COLON
 %token HEAD TAIL PREPEND EMPTY
 %token CAR CDR
-%token FLOAT_T BOOL_T 
+%token NUM_T BOOL_T 
 %nonassoc LET
 %nonassoc IN
 %left OR OR2 AND AND2
@@ -62,7 +62,7 @@ expr_lst:
 ;
 
 expr_T:
-  | FLOAT_T                           { NumT }
+  | NUM_T                             { NumT }
   | BOOL_T                            { BoolT }
 ;
 
@@ -90,7 +90,7 @@ expr:
   | VAR                                                                                  { VarS $1 }
   | LET VAR EQUAL expr IN expr                                                           { LetS ($2, $4, $6) }
   | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { FunS ($3, $5, $7, $11, $13) }
-  | BRACK_L FUN_DECL VAR COLON expr_T EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R                              { FunS2 ($3, $5, $8, $10) }
+  | BRACK_L FUN_DECL BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R        { FunS2 ($4, $6, $10, $12) }
   | expr DOT HEAD                                                                        { HeadS ($1) } 
   | expr DOT TAIL                                                                        { TailS ($1) } 
   | expr DOT FLOAT                                                                       { ListElS ($1, NumS $3) }

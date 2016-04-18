@@ -1,12 +1,1 @@
-(*
-%nonassoc LET 
-%nonassoc IN 
-%nonassoc FLOAT
-%nonassoc ELSE 
-%left OR OR2 AND AND2 
-%nonassoc EQ NEQ 
-%nonassoc NOT 
-%nonassoc COMPOP  
-%left PLUS MINUS 
-%left TIMES DIVIDE 
-*)
+[SKIADAS cool [x : NUM] = [x + 2 : NUM]]
