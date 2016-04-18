@@ -41,7 +41,6 @@ let t4a = evaluate (desugar (OrS (BoolS true, BoolS true))) = Bool true
 let t4b = evaluate (desugar (OrS (BoolS false, BoolS true))) = Bool true 
 let t4c = evaluate (desugar (OrS (BoolS true, BoolS false))) = Bool true 
 let t4d = evaluate (desugar (OrS (BoolS false, BoolS false))) = Bool false 
-https://github.com/gitslaton/HARIS.git
 let t5a = evaluate (desugar (AndS (BoolS true, BoolS true))) = Bool true 
 let t5b = evaluate (desugar (AndS (BoolS true, BoolS false))) = Bool false 
 let t5c = evaluate (desugar (AndS (BoolS false, BoolS true))) = Bool false 
