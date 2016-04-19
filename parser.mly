@@ -47,25 +47,25 @@
 
 
 main:
-  | headEx DBLSEMI                    { $1 }
+  | headEx DBLSEMI                      { $1 }
 ;
 
 headEx:
-  | expr                              { $1 }
-  | LET VAR EQUAL expr                { GLetS ($2, $4) }
+  | expr                                { $1 }
+  | LET VAR EQUAL expr                  { GLetS ($2, $4) }
 ;
 
 expr_lst:
-  | headEx                            { [$1] }
-  | headEx COMMA expr_lst             { $1 :: $3 }
-  | headEx DOLLAR expr_lst            { $1 :: $3 }
+  | headEx                              { [$1] }
+  | headEx COMMA expr_lst               { $1 :: $3 }
+  | headEx DOLLAR expr_lst              { $1 :: $3 }
 ;
 
 expr_T:
-  | NUM_T                             { NumT }
-  | BOOL_T                            { BoolT }
-  | LIST_T expr_T                     { ListT $2}
-  | TUP_T                             { TupT []}
+  | NUM_T                               { NumT }
+  | BOOL_T                              { BoolT }
+  | LIST_T expr_T                       { ListT $2}
+  | TUP_T                               { TupT []}
   | PAREN_L expr_T ARROW expr_T PAREN_R {FunT ($2, $4)}
 ;
 

@@ -220,9 +220,9 @@ let rec interp env r =
   | NumC i        -> Num i
   | BoolC b 	    -> Bool b
   | IfC (test, option1, option2) ->  let e = interp env test in
-                                     (match e with
-                                      | Bool b -> if b then interp env option1 else interp env option2
-                                      | _  -> raise (Interp "not a bool"))
+                                       (match e with
+                                        | Bool b -> if b then interp env option1 else interp env option2
+                                        | _  -> raise (Interp "not a bool"))
   | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
   | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
   | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
@@ -234,11 +234,11 @@ let rec interp env r =
   | FunC (fun_name, parameter, paraT, body, bodyT) -> Closure (env, r)
   | FunC2 (parameter, paraT, body, bodyT) -> Closure (env, r)
   | CallC (on_fun, arg) -> let c = interp env on_fun in
-                           let v = interp env arg in 
-                           (match c with
-                            | Closure (env', FunC (name, para, paraT, body, bodyT)) -> interp (bind name c (bind para v env')) body
-                            | Closure (env', FunC2 (para, paraT, body, bodyT)) -> interp (bind para v env') body
-                            | _ -> raise (Interp "Cannot run on non-closure"))
+                             let v = interp env arg in 
+                               (match c with
+                                | Closure (env', FunC (name, para, paraT, body, bodyT)) -> interp (bind name c (bind para v env')) body
+                                | Closure (env', FunC2 (para, paraT, body, bodyT)) -> interp (bind para v env') body
+                                | _ -> raise (Interp "Cannot run on non-closure"))
   |  VarC k -> (match lookup k env with 
                 | Some v -> v
                 | None -> raise (Interp "No matching variable found"))
@@ -287,56 +287,53 @@ let rec typecheck env ty =
                               | (NumT, NumT) -> BoolT
                               | (BoolT, BoolT) -> BoolT
                               | _ -> raise (Typecheck "Cannot do equality comparison on different types"))
-  (* 
-    List needs to have type of element and list
-  *)
-  | ListC list_val -> (match list_val with
-                       | [] -> ListT AnyT
-                       | element :: [] -> ListT (typecheck env element)
-                       | element :: rest -> ListT (typecheck_list env rest (typecheck env element)))
-  | LetC (var, expr1, expr2) -> typecheck (bind var (typecheck env expr1) env) expr2
-  | GLetC (var, expr1) -> let t = typecheck env expr1 in
-                              (global_static_env := bind var t env; t)
-  | TupC list_val -> TupT (List.fold_right (fun x acc -> (typecheck env x :: acc)) list_val [])
-  | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT (bind parameter paraT env)) body in
-                                                      if returnT = bodyT
-                                                      then FunT (paraT, bodyT)
-                                                      else raise (Typecheck "Suggested return type does not match actual body type")
-  | FunC2 (parameter, paraT, body, bodyT) -> if typecheck (bind parameter paraT env) body = bodyT
-                                             then FunT (paraT, bodyT)
-                                             else raise (Typecheck "Suggested return type does not match actual body type")
-  | CallC (on_fun, arg) -> (match typecheck env on_fun with
-                            | FunT (t1, t2) -> if t1 = typecheck env arg
-                                              then  t2
-                                              else raise (Typecheck "Argument type does not match function's expected type")
+     | ListC list_val -> (match list_val with
+                          | [] -> ListT AnyT
+                          | element :: [] -> ListT (typecheck env element)
+                          | element :: rest -> ListT (typecheck_list env rest (typecheck env element)))
+     | LetC (var, expr1, expr2) -> typecheck (bind var (typecheck env expr1) env) expr2
+     | GLetC (var, expr1) -> let t = typecheck env expr1 in
+                                 (global_static_env := bind var t env; t)
+     | TupC list_val -> TupT (List.fold_right (fun x acc -> (typecheck env x :: acc)) list_val [])
+     | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT (bind parameter paraT env)) body in
+                                                         if returnT = bodyT
+                                                         then FunT (paraT, bodyT)
+                                                         else raise (Typecheck "Suggested return type does not match actual body type")
+     | FunC2 (parameter, paraT, body, bodyT) -> if typecheck (bind parameter paraT env) body = bodyT
+                                                then FunT (paraT, bodyT)
+                                                else raise (Typecheck "Suggested return type does not match actual body type")
+     | CallC (on_fun, arg) -> (match typecheck env on_fun with
+                               | FunT (t1, t2) -> if t1 = typecheck env arg
+                                                  then  t2
+                                                  else raise (Typecheck "Argument type does not match function's expected type")
                             | _ -> raise (Typecheck "Calling non-function"))
-  | VarC k -> (match lookup k env with
-               | Some v -> v
-               | None -> raise (Typecheck "no matching variable found"))
-  | HeadC lst -> (match typecheck env lst with
-                  | ListT t -> t
-                  | _ -> raise (Typecheck "Cannot call HEAD on non-list"))
-  | TailC lst -> (match typecheck env lst with
-                  | ListT t -> t
-                  | _ -> raise (Typecheck "Cannot call TAIL on non-list"))
-  | ListElC (lst, n) -> (match (typecheck env lst, typecheck env n) with
-                         | ( t1, NumT) -> t1
-                         | _ -> raise (Typecheck "Given non-num for indexing"))
-  | ListEmC (lst) -> (match typecheck env lst with
-                      | ListT _  -> BoolT
-                      | _ -> raise (Typecheck "Invalid argument"))
-  | ListPrepC (lst, element) -> if typecheck env lst = typecheck env element
-                                then typecheck env element
-                                else raise (Typecheck "Cannot prepend onto list of different value type")
-  | TupCarC lst -> (match typecheck env lst with
-                    | TupT (hd :: tl) -> hd
-                    | _ -> raise (Typecheck "Cannot call CAR on non-list"))
-  | TupCdrC lst -> (match typecheck env lst with
-                    | TupT (hd::[]) -> hd
-                    | TupT (hd::hd'::[]) -> hd'
-                    | TupT (hd::tl) -> TupT tl
-                    | _ -> raise (Typecheck "Cannot call CDR on non-list"))
-  | _ -> raise (Typecheck "typecheck - Match Not Found")                
+     | VarC k -> (match lookup k env with
+                  | Some v -> v
+                  | None -> raise (Typecheck "no matching variable found"))
+     | HeadC lst -> (match typecheck env lst with
+                     | ListT t -> t
+                     | _ -> raise (Typecheck "Cannot call HEAD on non-list"))
+     | TailC lst -> (match typecheck env lst with
+                     | ListT t -> t
+                     | _ -> raise (Typecheck "Cannot call TAIL on non-list"))
+     | ListElC (lst, n) -> (match (typecheck env lst, typecheck env n) with
+                            | ( t1, NumT) -> t1
+                            | _ -> raise (Typecheck "Given non-num for indexing"))
+     | ListEmC (lst) -> (match typecheck env lst with
+                         | ListT _  -> BoolT
+                         | _ -> raise (Typecheck "Invalid argument"))
+     | ListPrepC (lst, element) -> if typecheck env lst = typecheck env element
+                                   then typecheck env element
+                                   else raise (Typecheck "Cannot prepend onto list of different value type")
+     | TupCarC lst -> (match typecheck env lst with
+                       | TupT (hd :: tl) -> hd
+                       | _ -> raise (Typecheck "Cannot call CAR on non-list"))
+     | TupCdrC lst -> (match typecheck env lst with
+                       | TupT (hd::[]) -> hd
+                       | TupT (hd::hd'::[]) -> hd'
+                       | TupT (hd::tl) -> TupT tl
+                       | _ -> raise (Typecheck "Cannot call CDR on non-list"))
+     | _ -> raise (Typecheck "typecheck - Match Not Found")                
 
 
 
