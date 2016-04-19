@@ -51,14 +51,14 @@ Lists are contained by the curly braces, `{ }`, and the carrot symbol, `^`, comb
 ```
 ####List Functions####
 HARIS has four built-in list functions to help work with and change lists. To access these functions, simply have a list, put `.` and the name of the function you're wanting to use after it.
-* `EMPTY`
+* `.EMPTY`
  * Parameters: list
  * Returns true if the list is empty or null and false if the opposite
-* `HEAD
+* `.HEAD`
  * Returns the first element (or head) of the list
-* `TAIL`
+* `.TAIL`
  * Returns the last element (or tail) of the list
-* `PREPEND`
+* `.PREPEND.`
  * Returns the list with an element prepended to the front of the list
 
 Prepend is a bit different. The following is an example of the proper syntax:
