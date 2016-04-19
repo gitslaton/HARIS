@@ -30,3 +30,6 @@ func [2] +- Should return -98 -+
 
 
 +-FOLDL-+
+
+
+[SKIADAS test [{x, y} : {NUM, NUM}] = [x * y : NUM]];;
