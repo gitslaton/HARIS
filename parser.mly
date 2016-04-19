@@ -23,7 +23,7 @@
 %token DOT COLON
 %token HEAD TAIL PREPEND EMPTY
 %token CAR CDR
-%token NUM_T BOOL_T 
+%token NUM_T BOOL_T  LIST_T TUP_T
 %nonassoc LET
 %nonassoc IN
 %left OR OR2 AND AND2
@@ -64,6 +64,8 @@ expr_lst:
 expr_T:
   | NUM_T                             { NumT }
   | BOOL_T                            { BoolT }
+  | LIST_T expr_T                     { ListT $2}
+  | TUP_T                             { TupT []}
 ;
 
 expr:

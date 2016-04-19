@@ -120,8 +120,8 @@ let lst_car lst =
 
 let lst_cdr lst = 
     match lst with
-    | [] -> raise (Lists "list is empty")
-    | element :: [] -> raise (Lists "list does not have enough elements")
+    | [] -> raise (Lists "tuple is empty")
+    | element :: [] -> raise (Lists "tuple does not have enough elements")
     | element :: rest -> rest
 (**)
 
@@ -249,7 +249,9 @@ let rec interp env r = match r with
                                                            | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
                                                            | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
                        | TupCarC TupC lst -> interp env (lst_head lst)
-                       | TupCdrC TupC lst -> interp env (TupC (lst_cdr lst))
+                       | TupCdrC TupC lst -> interp env (match lst_cdr lst with
+                                                         | element :: [] -> element
+                                                         | _ -> TupC (lst_cdr lst))
                        | _ -> raise (Interp "interp - Match Not Found")                
 
 
@@ -328,7 +330,9 @@ let rec typecheck env ty =
                     | TupT (hd :: tl) -> hd
                     | _ -> raise (Typecheck "Cannot call CAR on non-list"))
   | TupCdrC lst -> (match typecheck env lst with
-                    | TupT (hd::tl) -> TupT tl 
+                    | TupT (hd::[]) -> hd
+                    | TupT (hd::hd'::[]) -> hd'
+                    | TupT (hd::tl) -> TupT tl
                     | _ -> raise (Typecheck "Cannot call CDR on non-list"))
   | _ -> raise (Typecheck "typecheck - Match Not Found")                
 
@@ -356,6 +360,7 @@ let rec valToString r =
   | Bool b 			    -> string_of_bool b
   | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
   | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
+  | Closure (e, f)       -> ""
   | _               -> raise (Interp "not valid to express as string")
 
 let rec typeToString r =  
@@ -364,7 +369,7 @@ let rec typeToString r =
   | BoolT -> "BOOL" 
   | TupT lst -> "TUP: " ^ typeToString (lst_head lst)
   | ListT lst -> "LIST: " ^ typeToString lst
-  | FunT (para, body) -> typeToString para ^ typeToString body
+  | FunT (para, body) -> typeToString para ^ " -> " ^ typeToString body
   | _ -> "TYPE UNKNOWN") 
 
 let typeToCombo (vT, v) = 

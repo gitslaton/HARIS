@@ -29,6 +29,8 @@ rule token = parse
   | float as x              { FLOAT (float_of_string x) }
   | "NUM"                   { NUM_T}
   | "BOOL"                  { BOOL_T }
+  | "LIST"                  { LIST_T }
+  | "TUP"                   { TUP_T }
   | true 		                { TRUE } 
   | false 		              { FALSE }
   | "LET"                   { LET }
