@@ -183,76 +183,78 @@ let eqEval val_l val_r =
 
 (* INTERPRETER *)
 (* desugar : exprS -> exprC *)
-let rec desugar exprS = match exprS with
-                        | NumS i -> NumC i
-                        | BoolS b -> BoolC b
-                        | IfS (test, option1, option2) -> IfC (desugar test, desugar option1, desugar option2) 
-                        | NotS n -> IfC (desugar n, BoolC false, BoolC true) 
-                        | OrS (o1, o2) -> IfC (desugar o1, BoolC true, IfC (desugar o2, BoolC true, BoolC false)) 
-                        | AndS (a1, a2) -> IfC (desugar a1, IfC (desugar a2, BoolC true, BoolC false), BoolC false) 
-                        | ArithS (str_operator, val_l, val_r) -> ArithC (str_operator, desugar val_l, desugar val_r) 
-                        | CompS (str_operator, val_l, val_r) -> CompC (str_operator, desugar val_l, desugar val_r) 
-                        | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
-                        | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
-                        | ListS list_val -> ListC (List.map desugar list_val)
-                        | GLetS (var, expr1) -> GLetC (var, desugar expr1)
-                        | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
-                        | TupS list_val -> TupC (List.map desugar list_val)
-                        | FunS (name, parameter, paraT, body, bodyT) -> FunC (name, parameter, paraT, desugar body, bodyT)
-                        | FunS2 (parameter, paraT, body, bodyT) -> FunC2 (parameter, paraT, desugar body, bodyT)
-                        | CallS (on_fun, arg) -> CallC (desugar on_fun, desugar arg)
-                        | VarS k -> VarC k
-                        | HeadS lst -> HeadC (desugar lst)
-                        | TailS lst -> TailC (desugar lst)
-                        | ListElS (lst, n) -> ListElC (desugar lst, desugar n)
-                        | ListEmS (lst) -> ListEmC (desugar lst)
-                        | ListPrepS (lst, element) -> ListPrepC (desugar lst, desugar element)
-                        | TupCarS lst -> TupCarC (desugar lst)
-                        | TupCdrS lst -> TupCdrC (desugar lst)
-                        | _ -> raise (Interp "desugar - Match Not Found")
+let rec desugar exprS = 
+  match exprS with
+  | NumS i -> NumC i
+  | BoolS b -> BoolC b
+  | IfS (test, option1, option2) -> IfC (desugar test, desugar option1, desugar option2) 
+  | NotS n -> IfC (desugar n, BoolC false, BoolC true) 
+  | OrS (o1, o2) -> IfC (desugar o1, BoolC true, IfC (desugar o2, BoolC true, BoolC false)) 
+  | AndS (a1, a2) -> IfC (desugar a1, IfC (desugar a2, BoolC true, BoolC false), BoolC false) 
+  | ArithS (str_operator, val_l, val_r) -> ArithC (str_operator, desugar val_l, desugar val_r) 
+  | CompS (str_operator, val_l, val_r) -> CompC (str_operator, desugar val_l, desugar val_r) 
+  | EqS (val_l, val_r) -> EqC (desugar val_l, desugar val_r) 
+  | NeqS (val_l, val_r) -> desugar (NotS (EqS (val_l, val_r)))
+  | ListS list_val -> ListC (List.map desugar list_val)
+  | GLetS (var, expr1) -> GLetC (var, desugar expr1)
+  | LetS (var, expr1, expr2) -> LetC (var, desugar expr1, desugar expr2)
+  | TupS list_val -> TupC (List.map desugar list_val)
+  | FunS (name, parameter, paraT, body, bodyT) -> FunC (name, parameter, paraT, desugar body, bodyT)
+  | FunS2 (parameter, paraT, body, bodyT) -> FunC2 (parameter, paraT, desugar body, bodyT)
+  | CallS (on_fun, arg) -> CallC (desugar on_fun, desugar arg)
+  | VarS k -> VarC k
+  | HeadS lst -> HeadC (desugar lst)
+  | TailS lst -> TailC (desugar lst)
+  | ListElS (lst, n) -> ListElC (desugar lst, desugar n)
+  | ListEmS (lst) -> ListEmC (desugar lst)
+  | ListPrepS (lst, element) -> ListPrepC (desugar lst, desugar element)
+  | TupCarS lst -> TupCarC (desugar lst)
+  | TupCdrS lst -> TupCdrC (desugar lst)
+  | _ -> raise (Interp "desugar - Match Not Found")
 
 
 
 (* interp : Value env -> exprC -> value *)
-let rec interp env r = match r with
-                       | NumC i        -> Num i
-                       | BoolC b 	    -> Bool b
-                       | IfC (test, option1, option2) ->  let e = interp env test in
-                                                          (match e with
-                                                           | Bool b -> if b then interp env option1 else interp env option2
-                                                           | _  -> raise (Interp "not a bool"))
-                       | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
-                       | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
-                       | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
-                       | ListC list_val  -> List (List.map (interp env) list_val)
-                       | GLetC (var, expr1) -> let x = interp env expr1 in
-                                                  (global_env := bind var x env; x)
-                       | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
-                       | TupC list_val -> Tup (List.map (interp env) list_val)    
-                       | FunC (fun_name, parameter, paraT, body, bodyT) -> Closure (env, r)
-                       | FunC2 (parameter, paraT, body, bodyT) -> Closure (env, r)
-                       | CallC (on_fun, arg) -> let c = interp env on_fun in
-                                                let v = interp env arg in 
-                                                (match c with
-                                                 | Closure (env', FunC (name, para, paraT, body, bodyT)) -> interp (bind name c (bind para v env')) body
-                                                 | Closure (env', FunC2 (para, paraT, body, bodyT)) -> interp (bind para v env') body
-                                                 | _ -> raise (Interp "Cannot run on non-closure"))
-                       | VarC k -> (match lookup k env with 
-                                    | Some v -> v
-                                    | None -> raise (Interp "No matching variable found"))
-                       | HeadC ListC lst -> interp env (lst_head lst)
-                       | TailC ListC lst -> interp env (lst_tail lst)
-                       | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
-                       | ListEmC (ListC lst) -> interp env (BoolC (test_empty lst))
-                       | ListPrepC (ListC lst, element) -> (match element with
-                                                            | NumC element' -> interp env (ListC (prepend lst (NumC element')))
-                                                            | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
-                                                            | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
-                       | TupCarC TupC lst -> interp env (lst_head lst)
-                       | TupCdrC TupC lst -> interp env (match lst_cdr lst with
-                                                         | element :: [] -> element
-                                                         | _ -> TupC (lst_cdr lst))
-                       | _ -> raise (Interp "interp - Match Not Found")                
+let rec interp env r = 
+  match r with
+  | NumC i        -> Num i
+  | BoolC b 	    -> Bool b
+  | IfC (test, option1, option2) ->  let e = interp env test in
+                                     (match e with
+                                      | Bool b -> if b then interp env option1 else interp env option2
+                                      | _  -> raise (Interp "not a bool"))
+  | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
+  | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
+  | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
+  | ListC list_val  -> List (List.map (interp env) list_val)
+  | GLetC (var, expr1) -> let x = interp env expr1 in
+                             (global_env := bind var x env; x)
+  | LetC (var, expr1, expr2) -> interp (bind var (interp env expr1) env) expr2
+  | TupC list_val -> Tup (List.map (interp env) list_val)    
+  | FunC (fun_name, parameter, paraT, body, bodyT) -> Closure (env, r)
+  | FunC2 (parameter, paraT, body, bodyT) -> Closure (env, r)
+  | CallC (on_fun, arg) -> let c = interp env on_fun in
+                           let v = interp env arg in 
+                           (match c with
+                            | Closure (env', FunC (name, para, paraT, body, bodyT)) -> interp (bind name c (bind para v env')) body
+                            | Closure (env', FunC2 (para, paraT, body, bodyT)) -> interp (bind para v env') body
+                            | _ -> raise (Interp "Cannot run on non-closure"))
+  |  VarC k -> (match lookup k env with 
+                | Some v -> v
+                | None -> raise (Interp "No matching variable found"))
+  | HeadC ListC lst -> interp env (lst_head lst)
+  | TailC ListC lst -> interp env (lst_tail lst)
+  | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
+  | ListEmC (ListC lst) -> interp env (BoolC (test_empty lst))
+  | ListPrepC (ListC lst, element) -> (match element with
+                                       | NumC element' -> interp env (ListC (prepend lst (NumC element')))
+                                       | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
+                                       | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
+  | TupCarC TupC lst -> interp env (lst_head lst)
+  | TupCdrC TupC lst -> interp env (match lst_cdr lst with
+                                    | element :: [] -> element
+                                    | _ -> TupC (lst_cdr lst))
+  | _ -> raise (Interp "interp - Match Not Found")                
 
 
 
@@ -263,29 +265,29 @@ let rec typecheck env ty =
     | [] -> init
     | hd :: tl -> if (typecheck env hd) = init
                   then typecheck_list env tl init
-                  else raise (Typecheck "All values in list must have same type")) in
-  match ty with
-  | NumC i -> NumT
-  | BoolC b -> BoolT
-  | IfC (test, option1, option2) -> if typecheck env test = BoolT
-                                    then let t1 =  typecheck env option1 in
-                                         let t2 = typecheck env option2 in
-                                          if t1 = t2
-                                          then t1
-                                          else raise (Typecheck "If statement: then statement does not have same type as else")
-                                    else raise (Typecheck "If statement: test is not a boolean")
-  | ArithC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
-                                           then NumT
-                                           else raise (Typecheck "Cannot do arithmetic on non-Num")
-  | CompC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
-                                          then BoolT
-                                          else raise (Typecheck "Cannot do comparison on non-Num")
-  | EqC (val_l, val_r) -> let (t1, t2) = (typecheck env val_l, typecheck env val_r) in
-                          (match (t1, t2) with
-                           | (NumT, NumT) -> BoolT
-                           | (BoolT, BoolT) -> BoolT
-                           | _ -> raise (Typecheck "Cannot do equality comparison on different types"))
-  (*
+                  else raise (Typecheck "All values in list must have same type")) 
+  in match ty with
+     | NumC i -> NumT
+     | BoolC b -> BoolT
+     | IfC (test, option1, option2) -> if typecheck env test = BoolT
+                                       then let t1 =  typecheck env option1 in
+                                            let t2 = typecheck env option2 in
+                                            if t1 = t2
+                                            then t1
+                                            else raise (Typecheck "If statement: then statement does not have same type as else")
+                                       else raise (Typecheck "If statement: test is not a boolean")
+     | ArithC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
+                                             then NumT
+                                             else raise (Typecheck "Cannot do arithmetic on non-Num")
+     | CompC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
+                                             then BoolT
+                                             else raise (Typecheck "Cannot do comparison on non-Num")
+     | EqC (val_l, val_r) -> let (t1, t2) = (typecheck env val_l, typecheck env val_r) in
+                             (match (t1, t2) with
+                              | (NumT, NumT) -> BoolT
+                              | (BoolT, BoolT) -> BoolT
+                              | _ -> raise (Typecheck "Cannot do equality comparison on different types"))
+  (* 
     List needs to have type of element and list
   *)
   | ListC list_val -> (match list_val with

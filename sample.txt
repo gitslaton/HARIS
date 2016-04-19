@@ -1,1 +1,6 @@
-LET r = 1;;
+[SKIADAS MAP [F : (NUM -> NUM)] = 
+	[SKIADAS [LST : LIST NUM] = 
+		[LST : LIST NUM]]];;
+
+
+

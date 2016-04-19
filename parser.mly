@@ -23,7 +23,7 @@
 %token DOT COLON
 %token HEAD TAIL PREPEND EMPTY
 %token CAR CDR
-%token NUM_T BOOL_T  LIST_T TUP_T
+%token NUM_T BOOL_T  LIST_T TUP_T ARROW
 %nonassoc LET
 %nonassoc IN
 %left OR OR2 AND AND2
@@ -66,6 +66,7 @@ expr_T:
   | BOOL_T                            { BoolT }
   | LIST_T expr_T                     { ListT $2}
   | TUP_T                             { TupT []}
+  | PAREN_L expr_T ARROW expr_T PAREN_R {FunT ($2, $4)}
 ;
 
 expr:
@@ -91,8 +92,6 @@ expr:
   | CARROT_L CARROT_R                                                                                        { ListS [] }
   | CARROT_L expr_lst CARROT_R                                                                               { ListS ($2) }
   | LET VAR EQUAL expr IN expr                                                                               { LetS ($2, $4, $6) }
-  | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { GLetS ($3, FunS ($3, $5, $7, $11, $13)) }
-  | BRACK_L FUN_DECL BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R        { FunS2 ($4, $6, $10, $12) }
   | USE expr expr                                                                                            { CallS ($2, $3) }
   | expr DOT HEAD                                                                                            { HeadS ($1) } 
   | expr DOT TAIL                                                                                            { TailS ($1) } 
@@ -100,6 +99,8 @@ expr:
   | expr DOT EMPTY                                                                                           { ListEmS ($1) }
   | expr DOT PREPEND DOT expr                                                                                { ListPrepS ($1, $5) }
   | expr DOT CAR                                                                                             { TupCarS ($1) } 
-  | expr DOT CDR                                                                                             { TupCdrS ($1) } 
+  | expr DOT CDR                                                                                             { TupCdrS ($1) }
+  | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { GLetS ($3, FunS ($3, $5, $7, $11, $13)) }
+  | BRACK_L FUN_DECL BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R        { FunS2 ($4, $6, $10, $12) } 
 ;
 
