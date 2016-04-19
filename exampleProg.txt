@@ -12,24 +12,36 @@ LET lst = {^ 1 $ 2 $ 3 ^} IN map [
 func [15] +- Should return 15 -+
 func [2] +- Should return -98 -+
 
+
++--HIGHER ORDER FUNCTIONS+
 +-MAP-+
-[SKIADAS map [fun_x : FunT ] = 
-	LET acc = [] IN 
-	[SKIADAS f [lst: ListT] = 
-		IF lst.EMPTY
-		THEN acc
-		ELSE acc.PREPEND.(fun_x lst.HEAD)
-	]]
-
+[SKIADAS map [{fun_x, lst : {FUN, LIST}] = 
+	[IF lst = {^^}
+	 THEN {^^}
+	 ELSE LET head = lst.HEAD IN
+		  LET tail = lst.TAIL IN
+		  LET done = fun_x head IN
+		  map {fun_x, tail.PREPEND.done} : LIST NUM]]
 +-FILTER-+
-[SKIADAS
- 
-
-
+[SKIADAS filter [{fun_bool, lst : {FUN, LIST}] = 
+	[IF lst = {^^}
+	 THEN {^^}
+	 ELSE LET head = lst.HEAD IN
+		 	  LET tail = lst.TAIL IN
+			 	  IF fun_bool head == #t 
+			 	  THEN filter {fun_bool, tail}.PREPEND.head
+			 	  ELSE filter {fun_bool, tail} : LIST NUM]]
 +-FOLDR-+
-
-
+[SKIADAS foldr [{fun_a_b, lst, x} : {FUN, LIST, NUM}] = 
+	[IF lst = {^^}
+	 THEN {^x^}
+	 ELSE LET head = lst.HEAD IN
+		 	  LET tail = lst.TAIL IN 
+		 	  	 fun_a_b {head, foldr {fun_a_b, tail, x}}]]
 +-FOLDL-+
-
-
-[SKIADAS test [{x, y} : {NUM, NUM}] = [x * y : NUM]];;
+[SKIADAS foldl [{fun_a_b, x, lst} : {FUN, NUM, LIST}] = 
+	[IF lst = {^^}
+	 THEN {^x^}
+	 ELSE LET head = lst.HEAD IN
+		 	  LET tail = lst.TAIL IN 
+		 	  	 foldl {fun_a_b, fun_a_b {x, head}, tail}]]
