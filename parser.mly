@@ -69,36 +69,36 @@ expr_T:
 ;
 
 expr:
-  | VAR                                                                                  { VarS $1 }
-  | FLOAT                                                                                { NumS $1 }
-  | TRUE                                                                                 { BoolS true }
-  | FALSE                                                                                { BoolS false }
-  | IF expr THEN expr ELSE expr                                                          { IfS ($2, $4, $6) } 
-  | expr OR expr                                                                         { OrS ($1, $3) } 
-  | expr OR2 expr                                                                        { OrS ($1, $3) } 
-  | expr AND expr                                                                        { AndS ($1, $3) } 
-  | expr AND2 expr                                                                       { AndS ($1, $3) } 
-  | NOT expr                                                                             { NotS ($2) } 
-  | expr PLUS expr                                                                       { ArithS ("+", $1, $3) }
-  | expr MINUS expr                                                                      { ArithS ("-", $1, $3) }
-  | expr TIMES expr                                                                      { ArithS ("*", $1, $3) } 
-  | expr DIVIDE expr                                                                     { ArithS ("/", $1, $3) } 
-  | expr COMPOP expr                                                                     { CompS ($2, $1, $3) } 
-  | expr EQ expr                                                                         { EqS ($1, $3) }
-  | expr NEQ expr 	                                                                     { NeqS ($1, $3) }
-  | CURLY_L CURLY_R                                                                      { TupS [] } 
-  | CURLY_L expr_lst CURLY_R                                                             { TupS $2 }
-  | CARROT_L CARROT_R                                                                    { ListS [] }
-  | CARROT_L expr_lst CARROT_R                                                           { ListS ($2) }
+  | VAR                                                                                                      { VarS $1 }
+  | FLOAT                                                                                                    { NumS $1 }
+  | TRUE                                                                                                     { BoolS true }
+  | FALSE                                                                                                    { BoolS false }
+  | IF expr THEN expr ELSE expr                                                                              { IfS ($2, $4, $6) } 
+  | expr OR expr                                                                                             { OrS ($1, $3) } 
+  | expr OR2 expr                                                                                            { OrS ($1, $3) } 
+  | expr AND expr                                                                                            { AndS ($1, $3) } 
+  | expr AND2 expr                                                                                           { AndS ($1, $3) } 
+  | NOT expr                                                                                                 { NotS ($2) } 
+  | expr PLUS expr                                                                                           { ArithS ("+", $1, $3) }
+  | expr MINUS expr                                                                                          { ArithS ("-", $1, $3) }
+  | expr TIMES expr                                                                                          { ArithS ("*", $1, $3) } 
+  | expr DIVIDE expr                                                                                         { ArithS ("/", $1, $3) } 
+  | expr COMPOP expr                                                                                         { CompS ($2, $1, $3) } 
+  | expr EQ expr                                                                                             { EqS ($1, $3) }
+  | expr NEQ expr 	                                                                                         { NeqS ($1, $3) }
+  | CURLY_L CURLY_R                                                                                          { TupS [] } 
+  | CURLY_L expr_lst CURLY_R                                                                                 { TupS $2 }
+  | CARROT_L CARROT_R                                                                                        { ListS [] }
+  | CARROT_L expr_lst CARROT_R                                                                               { ListS ($2) }
   | LET VAR EQUAL expr IN expr                                                                               { LetS ($2, $4, $6) }
   | BRACK_L FUN_DECL VAR BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R    { GLetS ($3, FunS ($3, $5, $7, $11, $13)) }
   | BRACK_L FUN_DECL BRACK_L VAR COLON expr_T BRACK_R EQUAL BRACK_L expr COLON expr_T BRACK_R BRACK_R        { FunS2 ($4, $6, $10, $12) }
-  | USE expr expr                                                                                            {CallS ($2, $3)}
+  | USE expr expr                                                                                            { CallS ($2, $3) }
   | expr DOT HEAD                                                                                            { HeadS ($1) } 
   | expr DOT TAIL                                                                                            { TailS ($1) } 
   | expr DOT FLOAT                                                                                           { ListElS ($1, NumS $3) }
   | expr DOT EMPTY                                                                                           { ListEmS ($1) }
-  | expr DOT PREPEND DOT expr                                                                                { ListPrepS ($1, $5)}
+  | expr DOT PREPEND DOT expr                                                                                { ListPrepS ($1, $5) }
   | expr DOT CAR                                                                                             { TupCarS ($1) } 
   | expr DOT CDR                                                                                             { TupCdrS ($1) } 
 ;

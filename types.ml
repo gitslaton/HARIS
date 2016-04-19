@@ -218,9 +218,9 @@ let rec interp env r = match r with
                        | NumC i        -> Num i
                        | BoolC b 	    -> Bool b
                        | IfC (test, option1, option2) ->  let e = interp env test in
-                                                            (match e with
-                                                            | Bool b -> if b then interp env option1 else interp env option2
-                                                            | _  -> raise (Interp "not a bool"))
+                                                          (match e with
+                                                           | Bool b -> if b then interp env option1 else interp env option2
+                                                           | _  -> raise (Interp "not a bool"))
                        | ArithC (str_operator, val_l, val_r) -> arithEval str_operator (interp env val_l) (interp env val_r)
                        | CompC (str_operator, val_l, val_r) -> compEval str_operator (interp env val_l) (interp env val_r) 
                        | EqC (val_l, val_r) -> eqEval (interp env val_l) (interp env val_r)
@@ -245,9 +245,9 @@ let rec interp env r = match r with
                        | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
                        | ListEmC (ListC lst) -> interp env (BoolC (test_empty lst))
                        | ListPrepC (ListC lst, element) -> (match element with
-                                                           | NumC element' -> interp env (ListC (prepend lst (NumC element')))
-                                                           | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
-                                                           | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
+                                                            | NumC element' -> interp env (ListC (prepend lst (NumC element')))
+                                                            | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
+                                                            | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
                        | TupCarC TupC lst -> interp env (lst_head lst)
                        | TupCdrC TupC lst -> interp env (match lst_cdr lst with
                                                          | element :: [] -> element
@@ -269,10 +269,10 @@ let rec typecheck env ty =
   | BoolC b -> BoolT
   | IfC (test, option1, option2) -> if typecheck env test = BoolT
                                     then let t1 =  typecheck env option1 in
-                                            let t2 = typecheck env option2 in
-                                              if t1 = t2
-                                              then t1
-                                              else raise (Typecheck "If statement: then statement does not have same type as else")
+                                         let t2 = typecheck env option2 in
+                                          if t1 = t2
+                                          then t1
+                                          else raise (Typecheck "If statement: then statement does not have same type as else")
                                     else raise (Typecheck "If statement: test is not a boolean")
   | ArithC (str_operator, val_l, val_r) -> if typecheck env val_l = NumT && typecheck env val_r = NumT
                                            then NumT
@@ -282,16 +282,16 @@ let rec typecheck env ty =
                                           else raise (Typecheck "Cannot do comparison on non-Num")
   | EqC (val_l, val_r) -> let (t1, t2) = (typecheck env val_l, typecheck env val_r) in
                           (match (t1, t2) with
-                          | (NumT, NumT) -> BoolT
-                          | (BoolT, BoolT) -> BoolT
-                          | _ -> raise (Typecheck "Cannot do equality comparison on different types"))
+                           | (NumT, NumT) -> BoolT
+                           | (BoolT, BoolT) -> BoolT
+                           | _ -> raise (Typecheck "Cannot do equality comparison on different types"))
   (*
     List needs to have type of element and list
   *)
   | ListC list_val -> (match list_val with
-                      | [] -> ListT AnyT
-                      | element :: [] -> ListT (typecheck env element)
-                      | element :: rest -> ListT (typecheck_list env rest (typecheck env element)))
+                       | [] -> ListT AnyT
+                       | element :: [] -> ListT (typecheck env element)
+                       | element :: rest -> ListT (typecheck_list env rest (typecheck env element)))
   | LetC (var, expr1, expr2) -> typecheck (bind var (typecheck env expr1) env) expr2
   | GLetC (var, expr1) -> let t = typecheck env expr1 in
                               (global_static_env := bind var t env; t)
@@ -304,10 +304,10 @@ let rec typecheck env ty =
                                              then FunT (paraT, bodyT)
                                              else raise (Typecheck "Suggested return type does not match actual body type")
   | CallC (on_fun, arg) -> (match typecheck env on_fun with
-                           | FunT (t1, t2) -> if t1 = typecheck env arg
+                            | FunT (t1, t2) -> if t1 = typecheck env arg
                                               then  t2
                                               else raise (Typecheck "Argument type does not match function's expected type")
-                           | _ -> raise (Typecheck "Calling non-function"))
+                            | _ -> raise (Typecheck "Calling non-function"))
   | VarC k -> (match lookup k env with
                | Some v -> v
                | None -> raise (Typecheck "no matching variable found"))
@@ -346,31 +346,31 @@ let evaluate exprC = let t = typecheck (!global_static_env) exprC in
 
 let rec valToString r = 
   let rec list_to_string lst t =
-    match t with
-    | "list" -> (match lst with
-            		| [] -> ""
-            		| hd :: [] -> valToString hd
-            		| hd :: tl -> (valToString hd ^ " $ " ^ list_to_string tl "list"))
-    | _ -> (match lst with
-                | [] -> ""
-                | hd :: [] -> valToString hd
-                | hd :: tl -> (valToString hd ^ ", " ^ list_to_string tl "tup")) in 
-  match r with
-  | Num i           -> string_of_float i ^ "0"
-  | Bool b 			    -> string_of_bool b
-  | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
-  | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
-  | Closure (e, f)       -> ""
-  | _               -> raise (Interp "not valid to express as string")
+  match t with
+  | "list" -> (match lst with
+          		| [] -> ""
+          		| hd :: [] -> valToString hd
+          		| hd :: tl -> (valToString hd ^ " $ " ^ list_to_string tl "list"))
+  | _ -> (match lst with
+              | [] -> ""
+              | hd :: [] -> valToString hd
+              | hd :: tl -> (valToString hd ^ ", " ^ list_to_string tl "tup")) 
+  in match r with
+     | Num i           -> string_of_float i ^ "0"
+     | Bool b 			    -> string_of_bool b
+     | Tup lst         -> "{" ^ (list_to_string lst "tup") ^ "}"
+     | List lst 		    ->  "{^" ^ (list_to_string lst "list") ^ "^}" 
+     | Closure (e, f)       -> ""
+     | _               -> raise (Interp "not valid to express as string")
 
 let rec typeToString r =  
   (match r with
-  | NumT -> "NUM" 
-  | BoolT -> "BOOL" 
-  | TupT lst -> "TUP: " ^ typeToString (lst_head lst)
-  | ListT lst -> "LIST: " ^ typeToString lst
-  | FunT (para, body) -> typeToString para ^ " -> " ^ typeToString body
-  | _ -> "TYPE UNKNOWN") 
+   | NumT -> "NUM" 
+   | BoolT -> "BOOL" 
+   | TupT lst -> "TUP: " ^ typeToString (lst_head lst)
+   | ListT lst -> "LIST: " ^ typeToString lst
+   | FunT (para, body) -> typeToString para ^ " -> " ^ typeToString body
+   | _ -> "TYPE UNKNOWN") 
 
 let typeToCombo (vT, v) = 
   typeToString vT ^ " : " ^ valToString v 
