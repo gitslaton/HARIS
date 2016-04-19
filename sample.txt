@@ -1,6 +1,11 @@
-[SKIADAS MAP [F : (NUM -> NUM)] = 
-	[SKIADAS [LST : LIST NUM] = 
-		[LST : LIST NUM]]];;
+[SKIADAS MAP [FL : TUP] = 
+  [LET F = FL.CAR IN
+   LET LST = FL.CDR IN
+   IF LST.EMPTY 
+   THEN true
+   ELSE false : BOOL]];;
+
+USE MAP {1, {^ 1^}};;
 
 
 

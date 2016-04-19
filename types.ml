@@ -88,42 +88,56 @@ let bind str v env = (str, v) :: env
 (*LIST THINGS -> PREPEND/EMPTY//GETTING HEAD/GETTING TAIL*)
 (**)
 let prepend lst element = 
-    element :: lst
+  match lst with 
+  | List l -> List (element :: l)
+  | _ -> raise (Lists "Cannot prepend on non-list")
+
     
-let test_empty lst = 
-    match lst with 
-    | [] -> true
-    | _ -> false
+let test_empty lst =
+  match lst with 
+  | List [] -> Bool true
+  | List lst' -> Bool false
+  | _ -> raise (Lists "Cannot check if empty on non-list")
 
 let lst_head lst = 
     match lst with 
-    | [] -> raise (Lists "list is empty") 
-    | element :: rest -> element 
+    | List [] -> raise (Lists "list is empty") 
+    | List (element :: rest) -> element
+    | _ -> raise (Lists "Cannot get head on non-list") 
     
 let rec lst_tail lst = 
     match lst with
-    | [] -> raise (Lists "list is empty")
-    | element :: [] -> element
-    | element :: rest -> lst_tail rest
+    | List [] -> raise (Lists "list is empty")
+    | List (element :: rest) -> List rest
+    | _ -> raise (Lists "Cannot get tail on non-list")
 
 let rec lst_num lst num =
     match (lst, num) with 
-    | ([], num') -> raise (Lists "list out of bounds")
-    | (element :: rest, num') -> if num' = 0
-                                 then element 
-                                 else lst_num rest (num' - 1)
+    | (List [], _) -> raise (Lists "list out of bounds")
+    | (List (element :: rest), Num num') -> if num' = 0.0
+                                            then element 
+                                            else lst_num (List rest) (Num (num' -. 1.0))
+    | _ -> raise (Lists "Function called on non-list")
+                                       
 
 (*TUPLE THINGS -> CAR/CDR*)
 (**)
+
 let lst_car lst = 
-    lst_head lst
+    match lst with 
+    | Tup [] -> raise (Lists "Tup is empty") 
+    | Tup (element :: rest) -> element
+    | _ -> raise (Lists "Cannot get car on non-tup") 
+    
 
 let lst_cdr lst = 
     match lst with
-    | [] -> raise (Lists "tuple is empty")
-    | element :: [] -> raise (Lists "tuple does not have enough elements")
-    | element :: rest -> rest
+    | Tup [] -> raise (Lists "list is empty")
+    | Tup (element :: []) -> raise (Lists "Cannot call cdr on 1 element tuple")
+    | Tup (element :: rest) -> Tup rest
+    | _ -> raise (Lists "Cannot get tail on non-list")
 (**)
+
 
 (*MAP/FILTER/FOLDR/FOLDL*)
 (*
@@ -205,7 +219,7 @@ let rec desugar exprS =
   | VarS k -> VarC k
   | HeadS lst -> HeadC (desugar lst)
   | TailS lst -> TailC (desugar lst)
-  | ListElS (lst, n) -> ListElC (desugar lst, desugar n)
+  | ListElS (lst, n) -> ListElC (desugar lst, desugar n) 
   | ListEmS (lst) -> ListEmC (desugar lst)
   | ListPrepS (lst, element) -> ListPrepC (desugar lst, desugar element)
   | TupCarS lst -> TupCarC (desugar lst)
@@ -242,18 +256,16 @@ let rec interp env r =
   |  VarC k -> (match lookup k env with 
                 | Some v -> v
                 | None -> raise (Interp "No matching variable found"))
-  | HeadC ListC lst -> interp env (lst_head lst)
-  | TailC ListC lst -> interp env (lst_tail lst)
-  | ListElC (ListC lst, NumC n) -> let n' = int_of_float n in interp env (lst_num lst n')
-  | ListEmC (ListC lst) -> interp env (BoolC (test_empty lst))
-  | ListPrepC (ListC lst, element) -> (match element with
-                                       | NumC element' -> interp env (ListC (prepend lst (NumC element')))
-                                       | BoolC element' -> interp env (ListC (prepend lst (BoolC element')))
-                                       | _ -> raise (Lists "Prepend: not a single NUM or BOOL"))
-  | TupCarC TupC lst -> interp env (lst_head lst)
-  | TupCdrC TupC lst -> interp env (match lst_cdr lst with
-                                    | element :: [] -> element
-                                    | _ -> TupC (lst_cdr lst))
+  | HeadC lst -> lst_head (interp env lst)
+  | TailC lst -> lst_tail (interp env lst)
+  | ListElC (lst, n) -> lst_num (interp env lst) (interp env n)
+  | ListEmC lst -> test_empty (interp env lst)
+  | ListPrepC (lst, element) -> prepend (interp env lst) (interp env element)
+  | TupCarC lst -> lst_car (interp env lst)
+  | TupCdrC lst -> let c = lst_cdr (interp env lst) in
+                   (match c with
+                   | Tup (ele::[]) -> ele
+                   | _ -> c)
   | _ -> raise (Interp "interp - Match Not Found")                
 
 
@@ -294,7 +306,9 @@ let rec typecheck env ty =
      | LetC (var, expr1, expr2) -> typecheck (bind var (typecheck env expr1) env) expr2
      | GLetC (var, expr1) -> let t = typecheck env expr1 in
                                  (global_static_env := bind var t env; t)
-     | TupC list_val -> TupT (List.fold_right (fun x acc -> (typecheck env x :: acc)) list_val [])
+     | TupC list_val -> (match list_val with
+                         | [] -> TupT [AnyT] 
+                         | _ -> TupT (List.fold_right (fun x acc -> (typecheck env x :: acc)) list_val []))
      | FunC (fun_name, parameter, paraT, body, bodyT) -> let returnT = typecheck (bind fun_name paraT (bind parameter paraT env)) body in
                                                          if returnT = bodyT
                                                          then FunT (paraT, bodyT)
@@ -306,7 +320,10 @@ let rec typecheck env ty =
                                | FunT (t1, t2) -> if t1 = typecheck env arg
                                                   then  t2
                                                   else raise (Typecheck "Argument type does not match function's expected type")
-                            | _ -> raise (Typecheck "Calling non-function"))
+                               | AnyT -> AnyT
+                               | ListT AnyT -> AnyT
+                               | TupT [AnyT] -> AnyT
+                               | _ -> raise (Typecheck "Calling non-function"))
      | VarC k -> (match lookup k env with
                   | Some v -> v
                   | None -> raise (Typecheck "no matching variable found"))
@@ -314,24 +331,27 @@ let rec typecheck env ty =
                      | ListT t -> t
                      | _ -> raise (Typecheck "Cannot call HEAD on non-list"))
      | TailC lst -> (match typecheck env lst with
-                     | ListT t -> t
+                     | ListT t -> ListT t
                      | _ -> raise (Typecheck "Cannot call TAIL on non-list"))
      | ListElC (lst, n) -> (match (typecheck env lst, typecheck env n) with
-                            | ( t1, NumT) -> t1
+                            | (t1, NumT) -> t1
                             | _ -> raise (Typecheck "Given non-num for indexing"))
      | ListEmC (lst) -> (match typecheck env lst with
                          | ListT _  -> BoolT
+                         | TupT [AnyT] -> BoolT
                          | _ -> raise (Typecheck "Invalid argument"))
      | ListPrepC (lst, element) -> if typecheck env lst = typecheck env element
                                    then typecheck env element
                                    else raise (Typecheck "Cannot prepend onto list of different value type")
      | TupCarC lst -> (match typecheck env lst with
                        | TupT (hd :: tl) -> hd
+                       | TupT []  -> AnyT
                        | _ -> raise (Typecheck "Cannot call CAR on non-list"))
      | TupCdrC lst -> (match typecheck env lst with
                        | TupT (hd::[]) -> hd
                        | TupT (hd::hd'::[]) -> hd'
                        | TupT (hd::tl) -> TupT tl
+                       | TupT [] -> TupT [AnyT]
                        | _ -> raise (Typecheck "Cannot call CDR on non-list"))
      | _ -> raise (Typecheck "typecheck - Match Not Found")                
 
@@ -366,10 +386,10 @@ let rec typeToString r =
   (match r with
    | NumT -> "NUM" 
    | BoolT -> "BOOL" 
-   | TupT lst -> "TUP: " ^ typeToString (lst_head lst)
+   | TupT lst -> "TUP: " ^ (List.fold_right (fun x acc -> (typeToString x ^ " * " ^ acc)) lst "")
    | ListT lst -> "LIST: " ^ typeToString lst
    | FunT (para, body) -> typeToString para ^ " -> " ^ typeToString body
    | _ -> "TYPE UNKNOWN") 
 
 let typeToCombo (vT, v) = 
-  typeToString vT ^ " : " ^ valToString v 
+  typeToString vT ^ " | " ^ valToString v 

@@ -91,7 +91,7 @@ let t8j = evaluate (desugar (NeqS (NumS 5.0, NumS 4.0))) = (BoolT, Bool true)
 (*TUP TESTS*)
 let t9a = evaluate (TupC ((NumC 1.0) :: (NumC 8.0) :: [])) = (TupT [NumT; NumT], Tup [Num 1.0; Num 8.0]) 
 let t9b = evaluate (TupC (NumC 6.0 :: NumC 4.0 :: NumC 7.0 :: [])) = (TupT [NumT; NumT; NumT], Tup [Num 6.0; Num 4.0; Num 7.0])
-let t9c = evaluate (TupC (BoolC false :: BoolC true :: BoolC true :: BoolC false :: [])) = (TupT [BoolT; BoolT;BoolT;BoolT], Tup [Bool false; Bool true; Bool true; Bool false])
+let t9c = evaluate (TupC (NumC 1.0 :: BoolC true :: BoolC true :: BoolC false :: [])) = (TupT [NumT; BoolT;BoolT;BoolT], Tup [Num 1.0; Bool true; Bool true; Bool false])
 
 (*CAR TESTS*)
 let t10a = evaluate (TupCarC (TupC (NumC 1.0 :: NumC 8.0 :: []))) = (NumT, Num 1.0)
@@ -114,8 +114,8 @@ let t17a = evaluate (HeadC (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0 :: []))) = (
 let t17b = evaluate (HeadC (ListC (BoolC true :: []))) =  (BoolT, Bool true)
 
 (*TAIL TESTS*)
-let t18a = evaluate (TailC (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0 :: []))) = (NumT, Num 3.0)
-let t18b = evaluate (TailC (ListC (BoolC true :: []))) = (BoolT, Bool true)
+let t18a = evaluate (TailC (ListC (NumC 1.0 :: NumC 2.0 :: NumC 3.0 :: []))) = (ListT NumT, List [Num 2.0; Num 3.0])
+let t18b = evaluate (TailC (ListC (BoolC true :: []))) = (ListT BoolT, List [])
 
 (* LET TESTS *)
 let t11a = evaluate (desugar (LetS ("l", BoolS true, (AndS (VarS "l", BoolS true ) )))) = (BoolT, Bool true)
@@ -130,3 +130,11 @@ let t12d = evaluate (desugar (CallS (FunS ("f", "x", BoolT, EqS (BoolS true, Var
 let t12e = evaluate (desugar (CallS (FunS ("f", "x", NumT, VarS "x", NumT), NumS 4.0))) = (NumT, Num 4.0)
 let t12f = evaluate (desugar (CallS (FunS2 ("t", BoolT, NumS 1.0, NumT), BoolS true))) = (NumT, Num 1.0) 
 
+(* MAP *)
+(*
+let haris_map = (FunS ("map", "f_lst", TupT [FunT (NumT, NumT); ListT NumT], 
+											IfS (ListEmS (TupCdrS "f_lst"), 
+									(*then*) ListS [], 
+									(*else*)(ListPrepS (CallS "map", (TupS (TupCarS "f_lst"), (TailS (TupCdrS "f_lst")))), (CallS (TupCarS "f_lst"), (HeadS (TupCdrS "f_lst"))))),
+													 ListT NumT))
+*)
