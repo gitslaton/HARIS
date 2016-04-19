@@ -108,8 +108,8 @@ NUM +-use for numbers-+
 BOOL +-use for booleans-+
 TUP +- use for tuples -+
 LIST type_of_list_members +- use the keyword LIST followed by 1 type keyword for its members -+
-input_type -> body_return_type +- use for function types. You must list the type of its parameter followed by an arrow and                                then its output type -+
-
+input_type -> body_return_type +- use for function types. You must list the type of its parameter followed by an arrow and then its output type -+
+```
 
 ####Calling a Function####
 To call a function, use the keyword `USE` followed by the function or function name and then it's needed parameters.
